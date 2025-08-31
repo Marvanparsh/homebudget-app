@@ -1,0 +1,242 @@
+/* Authentication Styles */
+
+/* Auth container */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, hsl(var(--accent) / 0.1), hsl(var(--bkg)));
+  padding: var(--space-md);
+}
+
+.auth-card {
+  background: hsl(var(--bkg));
+  border-radius: var(--round-md);
+  box-shadow: 0 8px 24px hsl(var(--muted) / 0.15);
+  padding: var(--space-sm);
+  width: 100%;
+  max-width: 280px;
+  border: 1px solid hsl(var(--light));
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: var(--space-sm);
+}
+
+.auth-header h1 {
+  color: hsl(var(--text));
+  margin-bottom: var(--space-xs);
+  font-size: var(--fs-400);
+}
+
+.auth-header p {
+  color: hsl(var(--muted));
+  margin: 0;
+  font-size: var(--fs-200);
+}
+
+/* Auth form */
+.auth-form {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.form-group {
+  display: grid;
+  gap: 4px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: hsl(var(--text));
+  font-size: var(--fs-200);
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: var(--space-sm);
+  width: 20px;
+  height: 20px;
+  color: hsl(var(--muted));
+  z-index: 1;
+}
+
+.input-with-icon input {
+  padding-left: 48px;
+  padding-right: 48px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: var(--space-sm);
+  background: none;
+  border: none;
+  color: hsl(var(--muted));
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle:hover {
+  background: hsl(var(--light));
+  color: hsl(var(--accent));
+}
+
+.password-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Error message */
+.error-message {
+  background: hsl(var(--warning) / 0.1);
+  color: hsl(var(--warning));
+  padding: var(--space-sm);
+  border-radius: var(--round-sm);
+  border: 1px solid hsl(var(--warning) / 0.3);
+  font-size: var(--fs-300);
+  text-align: center;
+}
+
+/* Full width button */
+.btn-full {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Auth footer */
+.auth-footer {
+  text-align: center;
+  margin-top: var(--space-sm);
+  padding-top: var(--space-sm);
+  border-top: 1px solid hsl(var(--light));
+}
+
+.auth-footer p {
+  color: hsl(var(--muted));
+  margin: 0;
+}
+
+.auth-link {
+  color: hsl(var(--accent));
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.auth-link:hover {
+  color: hsl(var(--accent));
+  text-decoration: underline;
+}
+
+/* Nav user section */
+.nav-user-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  align-items: stretch;
+}
+
+.nav-user-name {
+  color: hsl(var(--text));
+  font-weight: 600;
+  text-align: center;
+  padding: var(--space-xs);
+}
+
+/* Auth redirect message */
+.auth-redirect {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-xl);
+  gap: var(--space-md);
+}
+
+.auth-redirect h1 {
+  color: hsl(var(--text));
+  margin: 0;
+}
+
+.auth-redirect p {
+  color: hsl(var(--muted));
+  margin: 0;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .auth-container {
+    padding: var(--space-sm);
+  }
+  
+  .auth-card {
+    padding: var(--space-md);
+    max-width: 280px;
+  }
+  
+  .nav-user-section {
+    width: 100%;
+  }
+  
+  .nav-form .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: var(--space-sm);
+    max-width: 260px;
+  }
+  
+  .auth-header h1 {
+    font-size: var(--fs-500);
+  }
+}
+/* Signin container styling */
+.signin-container {
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.signin-container h1 {
+  font-size: var(--fs-500);
+  margin-bottom: var(--space-xs);
+  text-align: center;
+}
+
+.signin-container p {
+  color: hsl(var(--muted));
+  text-align: center;
+  margin-bottom: var(--space-md);
+  font-size: var(--fs-300);
+}
+
+.signin-container .grid-sm {
+  gap: var(--space-sm);
+}
+
+.signin-container .form-group {
+  gap: var(--space-xs);
+}
+
+.signin-container .btn {
+  margin-top: var(--space-sm);
+  width: 100%;
+}

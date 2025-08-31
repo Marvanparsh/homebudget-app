@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <meta name="description" content="Take control of your money with smart budgeting and expense tracking" />
+    <meta name="theme-color" content="#0891b2" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <title>HomeBudget - Personal Finance Manager</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      // Reset zoom on page navigation
+      window.addEventListener('pageshow', function() {
+        if (window.visualViewport) {
+          document.querySelector('meta[name="viewport"]').setAttribute('content', 
+            'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes');
+        }
+      });
+      
+      // Reset zoom on route changes
+      let lastUrl = location.href;
+      new MutationObserver(() => {
+        const url = location.href;
+        if (url !== lastUrl) {
+          lastUrl = url;
+          setTimeout(() => {
+            window.scrollTo(0, 0);
+            if (window.visualViewport && window.visualViewport.scale !== 1) {
+              document.querySelector('meta[name="viewport"]').setAttribute('content', 
+                'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes');
+            }
+          }, 100);
+        }
+      }).observe(document, {subtree: true, childList: true});
+    </script>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

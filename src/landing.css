@@ -1,0 +1,30 @@
+/* Landing Page Styles */
+
+.landing-actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.layout > img {
+  margin-top: auto;
+}
+
+.intro {
+  align-self: end;
+  justify-self: center;
+  margin-bottom: 10vh;
+  padding-top: 120px;
+}
+
+.auth-card {
+  display: grid;
+  gap: var(--space-sm);
+  max-width: 25ch;
+}
+
+@media (max-width: 480px) {
+  .landing-actions {
+    flex-direction: column;
+  }
+}
