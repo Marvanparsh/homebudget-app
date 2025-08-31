@@ -3,8 +3,6 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   build-and-deploy:
@@ -19,18 +17,14 @@ jobs:
       with:
         node-version: '18'
         
-    - name: Clear npm cache
-      run: npm cache clean --force
-      
     - name: Install dependencies
-      run: npm install --no-package-lock
+      run: npm install
       
     - name: Build
       run: npm run build
       
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
-      if: github.ref == 'refs/heads/main'
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./dist
