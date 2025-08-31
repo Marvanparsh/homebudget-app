@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import { Form, Link, useActionData, useNavigation } from 'react-router-dom';
 import { EyeIcon, EyeSlashIcon, UserIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import illustration from '../assets/illustration.jpg';
+import darkIllustration from '../assets/dark.webp';
 import wave from '../assets/wave.svg';
+import { useTheme } from '../contexts/ThemeContext';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const actionData = useActionData();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === 'submitting';
+  const { isDark } = useTheme();
 
   return (
     <div className="layout">
@@ -21,7 +24,7 @@ const Login = () => {
               <div className="form-group">
                 <label htmlFor="identifier">Email or Username</label>
                 <div className="input-with-icon">
-                  <UserIcon className="input-icon" />
+                  {/* <UserIcon className="input-icon" /> */}
                   <input
                     type="text"
                     id="identifier"
@@ -36,7 +39,7 @@ const Login = () => {
               <div className="form-group">
                 <label htmlFor="password">Password</label>
                 <div className="input-with-icon">
-                  <LockClosedIcon className="input-icon" />
+                  {/* <LockClosedIcon className="input-icon" /> */}
                   <input
                     type={showPassword ? 'text' : 'password'}
                     id="password"
@@ -72,7 +75,7 @@ const Login = () => {
               <Link to="/signup">Sign up here</Link>
             </p>
           </div>
-          <img src={illustration} alt="Person with money" width={600} height={400} />
+          <img src={isDark ? darkIllustration : illustration} alt="Person with money" width={600} height={400} />
         </div>
       </main>
       <img src={wave} alt="Decorative wave pattern" />

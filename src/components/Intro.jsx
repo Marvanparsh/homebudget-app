@@ -5,8 +5,14 @@ import { UserPlusIcon } from "@heroicons/react/24/solid";
 
 // assets
 import illustration from "../assets/illustration.jpg"
+import darkIllustration from "../assets/dark.webp"
+
+// context
+import { useTheme } from "../contexts/ThemeContext";
 
 const Intro = () => {
+  const { isDark } = useTheme();
+  
   return (
     <div className="intro">
       <div>
@@ -30,7 +36,7 @@ const Intro = () => {
           </button>
         </Form>
       </div>
-      <img src={illustration} alt="Person with money" width={600} height={400} />
+      <img src={isDark ? darkIllustration : illustration} alt="Person with money" width={600} height={400} />
     </div>
   )
 }

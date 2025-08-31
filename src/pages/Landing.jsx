@@ -1,9 +1,13 @@
 import { Link } from 'react-router-dom';
 import { UserPlusIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import illustration from '../assets/illustration.jpg';
+import darkIllustration from '../assets/dark.webp';
 import wave from '../assets/wave.svg';
+import { useTheme } from '../contexts/ThemeContext';
 
 const Landing = () => {
+  const { isDark } = useTheme();
+  
   return (
     <div className="layout">
       <main>
@@ -26,7 +30,7 @@ const Landing = () => {
               </Link>
             </div>
           </div>
-          <img src={illustration} alt="Person with money" width={600} height={400} />
+          <img src={isDark ? darkIllustration : illustration} alt="Person with money" width={600} height={400} />
         </div>
       </main>
       <img src={wave} alt="Decorative wave pattern" />
