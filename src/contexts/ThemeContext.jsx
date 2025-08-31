@@ -14,9 +14,9 @@ export const ThemeProvider = ({ children }) => {
   const [isDark, setIsDark] = useState(() => {
     try {
       const saved = localStorage.getItem("theme");
-      return saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+      return saved ? saved === "dark" : false;
     } catch (error) {
-      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+      return false;
     }
   });
 
