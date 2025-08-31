@@ -29,7 +29,7 @@ export async function loginAction({ request }) {
     window.dispatchEvent(new Event('authChange'));
     
     toast.success(`Welcome back, ${user.fullName}!`);
-    return redirect('/');
+    return redirect('/dashboard');
   } catch (error) {
     console.error('Login error:', error);
     return { error: 'An error occurred during login. Please try again.' };
@@ -87,7 +87,7 @@ export async function signupAction({ request }) {
     window.dispatchEvent(new Event('authChange'));
     
     toast.success(`Welcome to HomeBudget, ${newUser.fullName}!`);
-    return redirect('/');
+    return redirect('/dashboard');
   } catch (error) {
     console.error('Signup error:', error);
     return { error: 'An error occurred during registration. Please try again.' };

@@ -34,6 +34,11 @@ import Landing from "./pages/Landing";
 
 const router = createBrowserRouter([
   {
+    path: "/",
+    element: <Landing />,
+    errorElement: <Error />,
+  },
+  {
     path: "/welcome",
     element: <Landing />,
     errorElement: <Error />,
@@ -51,7 +56,7 @@ const router = createBrowserRouter([
     errorElement: <Error />,
   },
   {
-    path: "/",
+    path: "/dashboard",
     element: (
       <ProtectedRoute>
         <Main />
