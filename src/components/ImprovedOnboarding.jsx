@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircleIcon, LightBulbIcon, PlayIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, LightBulbIcon, PlayIcon, FlagIcon, CurrencyDollarIcon, BoltIcon } from '@heroicons/react/24/outline';
 
 const ImprovedOnboarding = ({ onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -8,21 +8,24 @@ const ImprovedOnboarding = ({ onComplete }) => {
   const steps = [
     {
       id: 'welcome',
-      title: 'Welcome to Your Financial Journey! 🎯',
+      title: 'Welcome to Your Financial Journey!',
+      icon: <FlagIcon width={24} />,
       description: 'Take control of your money with smart budgeting',
       action: 'Get Started',
       tips: ['Track every expense', 'Set realistic budgets', 'Review weekly']
     },
     {
       id: 'budget',
-      title: 'Create Your First Budget 💰',
+      title: 'Create Your First Budget',
+      icon: <CurrencyDollarIcon width={24} />,
       description: 'Start with categories like Food, Transport, Entertainment',
       action: 'Create Budget',
       tips: ['Use the 50/30/20 rule', 'Start small', 'Be realistic']
     },
     {
       id: 'expense',
-      title: 'Add Your First Expense ⚡',
+      title: 'Add Your First Expense',
+      icon: <BoltIcon width={24} />,
       description: 'Quick entry with voice input and templates',
       action: 'Add Expense',
       tips: ['Use quick templates', 'Voice input available', 'Auto-categorization']
@@ -54,7 +57,10 @@ const ImprovedOnboarding = ({ onComplete }) => {
 
       <div className="onboarding-content">
         <div className="step-header">
-          <h2>{steps[currentStep].title}</h2>
+          <div className="step-title">
+            {steps[currentStep].icon}
+            <h2>{steps[currentStep].title}</h2>
+          </div>
           <p>{steps[currentStep].description}</p>
         </div>
 

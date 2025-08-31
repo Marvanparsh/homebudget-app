@@ -74,6 +74,13 @@ const Login = () => {
               Don't have an account?{' '}
               <Link to="/signup">Sign up here</Link>
             </p>
+            
+            <div className="login-encouragement">
+              <div className="encouragement-icon">🌟</div>
+              <p className="encouragement-text">
+                Welcome back! Ready to continue your financial success story?
+              </p>
+            </div>
           </div>
           <img src={isDark ? darkIllustration : illustration} alt="Person with money" width={600} height={400} />
         </div>

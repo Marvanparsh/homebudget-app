@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Link, useActionData, useNavigation } from 'react-router-dom';
-import { EyeIcon, EyeSlashIcon, UserIcon, LockClosedIcon, EnvelopeIcon, IdentificationIcon } from '@heroicons/react/24/outline';
+import { EyeIcon, EyeSlashIcon, UserIcon, LockClosedIcon, EnvelopeIcon, IdentificationIcon, RocketLaunchIcon } from '@heroicons/react/24/outline';
 import illustration from '../assets/illustration.jpg';
 import darkIllustration from '../assets/dark.webp';
 import wave from '../assets/wave.svg';
@@ -27,7 +27,7 @@ const Signup = () => {
                 <div className="form-group">
                   <label htmlFor="fullName">Full Name</label>
                   <div className="input-with-icon">
-                    <IdentificationIcon className="input-icon" />
+                   
                     <input
                       type="text"
                       id="fullName"
@@ -45,7 +45,6 @@ const Signup = () => {
                 <div className="form-group">
                   <label htmlFor="email">Email Address</label>
                   <div className="input-with-icon">
-                    <EnvelopeIcon className="input-icon" />
                     <input
                       type="email"
                       id="email"
@@ -59,7 +58,6 @@ const Signup = () => {
                 <div className="form-group">
                   <label htmlFor="username">Username</label>
                   <div className="input-with-icon">
-                    <UserIcon className="input-icon" />
                     <input
                       type="text"
                       id="username"
@@ -77,7 +75,6 @@ const Signup = () => {
                 <div className="form-group">
                   <label htmlFor="password">Password</label>
                   <div className="input-with-icon">
-                    <LockClosedIcon className="input-icon" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       id="password"
@@ -101,7 +98,6 @@ const Signup = () => {
                 <div className="form-group">
                   <label htmlFor="confirmPassword">Confirm Password</label>
                   <div className="input-with-icon">
-                    <LockClosedIcon className="input-icon" />
                     <input
                       type={showConfirmPassword ? 'text' : 'password'}
                       id="confirmPassword"
@@ -140,6 +136,13 @@ const Signup = () => {
               Already have an account?{' '}
               <Link to="/login">Sign in here</Link>
             </p>
+            
+            <div className="signup-encouragement">
+              <div className="encouragement-icon"><RocketLaunchIcon width={32} /></div>
+              <p className="encouragement-text">
+                You're about to start an amazing financial journey!
+              </p>
+            </div>
           </div>
           <img src={isDark ? darkIllustration : illustration} alt="Person with money" width={600} height={400} />
         </div>

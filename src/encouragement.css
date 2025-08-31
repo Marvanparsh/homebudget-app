@@ -1,0 +1,87 @@
+/* first budget encouragement */
+.first-budget-encouragement {
+  text-align: center;
+  padding: var(--space-xl);
+  background: linear-gradient(135deg, hsl(var(--accent) / 0.1), hsl(280, 70%, 95%));
+  border-radius: var(--round-lg);
+  border: 2px solid hsl(var(--accent) / 0.3);
+  margin-bottom: var(--space-lg);
+}
+
+.first-budget-encouragement .encouragement-icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-md);
+  display: block;
+  animation: sparkle 3s infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(-5deg) scale(1.1);
+  }
+  75% {
+    transform: rotate(5deg) scale(1.1);
+  }
+}
+
+.first-budget-encouragement h2 {
+  color: hsl(var(--accent));
+  margin-bottom: var(--space-sm);
+}
+
+.first-budget-encouragement p {
+  color: hsl(var(--text));
+  margin: var(--space-xs) 0;
+  font-size: var(--fs-300);
+}
+
+.motivation-tips {
+  background: hsl(var(--light) / 0.3);
+  border-radius: var(--round-lg);
+  padding: var(--space-lg);
+  margin-top: var(--space-lg);
+}
+
+.motivation-tips h3 {
+  color: hsl(var(--accent));
+  margin-bottom: var(--space-md);
+  text-align: center;
+}
+
+.motivation-tips ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.motivation-tips li {
+  padding: var(--space-sm);
+  margin-bottom: var(--space-xs);
+  background: hsl(var(--bkg));
+  border-radius: var(--round-md);
+  border-left: 4px solid hsl(var(--accent));
+  transition: all 0.2s ease;
+}
+
+.motivation-tips li:hover {
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px hsl(var(--accent) / 0.2);
+}
+
+/* responsive */
+@media (max-width: 768px) {
+  .first-budget-encouragement {
+    padding: var(--space-lg);
+  }
+  
+  .first-budget-encouragement .encouragement-icon {
+    font-size: 2.5rem;
+  }
+  
+  .motivation-tips {
+    padding: var(--space-md);
+  }
+}

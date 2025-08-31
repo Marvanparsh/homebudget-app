@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { Form, useFetcher } from "react-router-dom"
 
 // library imports
-import { CurrencyDollarIcon } from "@heroicons/react/24/solid"
 
 // helpers
 import { BUDGET_CATEGORIES, fetchUserData } from "../helpers"
@@ -93,8 +92,15 @@ const AddBudgetForm = () => {
             enableVoice={true}
             required
             ref={focusRef}
+            className={errors.name ? 'error' : ''}
+            aria-invalid={errors.name ? 'true' : 'false'}
+            aria-describedby={errors.name ? 'name-error' : undefined}
           />
-          {errors.name && <span className="error-message">{errors.name}</span>}
+          {errors.name && (
+            <span className="error-message" id="name-error" role="alert">
+              ⚠️ {errors.name}
+            </span>
+          )}
           <input type="hidden" name="newBudget" value={formData.name} />
         </div>
         <div className="grid-xs">
@@ -110,8 +116,15 @@ const AddBudgetForm = () => {
             showQuickAmounts={true}
             inputMode="decimal"
             required
+            className={errors.amount ? 'error' : ''}
+            aria-invalid={errors.amount ? 'true' : 'false'}
+            aria-describedby={errors.amount ? 'amount-error' : undefined}
           />
-          {errors.amount && <span className="error-message">{errors.amount}</span>}
+          {errors.amount && (
+            <span className="error-message" id="amount-error" role="alert">
+              ⚠️ {errors.amount}
+            </span>
+          )}
           <input type="hidden" name="newBudgetAmount" value={formData.amount} />
         </div>
         <div className="grid-xs">
@@ -125,12 +138,35 @@ const AddBudgetForm = () => {
           </select>
         </div>
         <input type="hidden" name="_action" value="createBudget" />
-        <button type="submit" className="btn btn--dark" disabled={isSubmitting}>
+        <button 
+          type="submit" 
+          className={`btn btn--dark ${isSubmitting ? 'loading' : ''}`}
+          disabled={isSubmitting}
+          style={{
+            width: '100%',
+            minHeight: '48px',
+            fontSize: 'var(--fs-300)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 'var(--space-xs)',
+            touchAction: 'manipulation'
+          }}
+        >
           {
-            isSubmitting ? <span>Submitting…</span> : (
+            isSubmitting ? (
               <>
-                <span>Create budget</span>
-                <CurrencyDollarIcon width={20} />
+                <span>Creating Budget…</span>
+                <div className="spinner" style={{width: '16px', height: '16px', borderWidth: '2px'}}></div>
+              </>
+            ) : (
+              <>
+                <span>Create Budget</span>
+                <span style={{
+                  fontSize: '20px', 
+                  fontWeight: 'bold',
+                  lineHeight: '1'
+                }}>₹</span>
               </>
             )
           }

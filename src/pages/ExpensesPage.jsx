@@ -4,10 +4,12 @@ import { useState, useMemo } from "react";
 
 // library import
 import { toast } from "react-toastify";
+import { BoltIcon } from "@heroicons/react/24/outline";
 
 // component imports
 import Table from "../components/Table";
 import SearchFilter from "../components/SearchFilter";
+import SimpleAchievementBar from "../components/SimpleAchievementBar";
 
 // helpers
 import { deleteItem, fetchUserData, searchExpenses, filterExpenses } from "../helpers";
@@ -47,6 +49,7 @@ const ExpensesPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({ budget: "", date: "" });
 
+
   const filteredExpenses = useMemo(() => {
     let result = searchExpenses(expenses, searchTerm);
     result = filterExpenses(result, filters);
@@ -74,6 +77,22 @@ const ExpensesPage = () => {
       ) : (
         <p>{searchTerm || filters.budget || filters.date ? 'No matching expenses found' : 'No Expenses to show'}</p>
       )}
+      
+      <div className="encouragement-section">
+        <div className="encouragement-card">
+          <div className="encouragement-icon"><BoltIcon width={32} /></div>
+          <h3>Financial Warrior!</h3>
+          <p>You're actively managing your money - that's awesome! Every expense you track brings you closer to financial freedom.</p>
+        </div>
+      </div>
+      
+      <SimpleAchievementBar expenses={expenses || []} budgets={budgets || []} />
+      
+      <div className="acknowledgment">
+        <p className="muted">
+          Built with React Router • Personal Finance Manager
+        </p>
+      </div>
     </div>
   );
 };

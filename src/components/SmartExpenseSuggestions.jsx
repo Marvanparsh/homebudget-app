@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { SparklesIcon, ClockIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
+import { SparklesIcon, ClockIcon, ArrowTrendingUpIcon, SunIcon, FireIcon } from '@heroicons/react/24/outline';
 import { fetchUserData } from '../helpers';
 
 const SmartExpenseSuggestions = ({ onSuggestionSelect }) => {
@@ -40,9 +40,9 @@ const SmartExpenseSuggestions = ({ onSuggestionSelect }) => {
 
   const quickAmounts = [5, 10, 15, 25, 50, 100];
   const timeBasedSuggestions = [
-    { name: 'Morning Coffee', amount: 5, time: 'morning', icon: '☕' },
-    { name: 'Lunch', amount: 12, time: 'afternoon', icon: '🍽️' },
-    { name: 'Dinner', amount: 20, time: 'evening', icon: '🍽️' }
+    { name: 'Morning Coffee', amount: 5, time: 'morning', icon: <SunIcon width={16} /> },
+    { name: 'Lunch', amount: 12, time: 'afternoon', icon: <FireIcon width={16} /> },
+    { name: 'Dinner', amount: 20, time: 'evening', icon: <FireIcon width={16} /> }
   ];
 
   const getCurrentTimeSuggestion = () => {

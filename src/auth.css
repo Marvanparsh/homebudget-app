@@ -270,6 +270,41 @@
   }
 }
 
+/* auth encouragement */
+.signup-encouragement,
+.login-encouragement {
+  text-align: center;
+  margin-top: var(--space-md);
+  padding: var(--space-md);
+  background: linear-gradient(135deg, hsl(var(--accent) / 0.1), hsl(var(--accent) / 0.05));
+  border-radius: var(--round-md);
+  border: 1px solid hsl(var(--accent) / 0.2);
+}
+
+.signup-encouragement .encouragement-icon,
+.login-encouragement .encouragement-icon {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-xs);
+  display: block;
+  animation: pulse 2s infinite;
+}
+
+.encouragement-text {
+  margin: 0;
+  color: hsl(var(--accent));
+  font-weight: 500;
+  font-size: var(--fs-200);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
 @media (max-width: 480px) {
   .signup-form {
     gap: var(--space-sm);
@@ -280,6 +315,24 @@
   }
   
   .signin-container {
+    padding: var(--space-sm);
+  }
+  
+  .encouragement-section {
+    margin: var(--space-lg) 0;
+  }
+  
+  .encouragement-card {
+    padding: var(--space-md);
+  }
+  
+  .encouragement-icon {
+    font-size: 2rem;
+  }
+  
+  .signup-encouragement,
+  .login-encouragement {
+    margin-top: var(--space-sm);
     padding: var(--space-sm);
   }
 }

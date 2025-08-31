@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { TrophyIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import { calculateSpentByBudget } from '../helpers';
 
 const GoalCelebration = ({ budgets }) => {
@@ -16,7 +17,7 @@ const GoalCelebration = ({ budgets }) => {
       if (percentage < 0.8 && spent > 0 && !celebratedGoals.includes(goalKey)) {
         setCelebration({
           type: 'budget-success',
-          title: '🎉 Great Job!',
+          title: 'Great Job!',
           message: `You're staying under budget for ${budget.name}!`,
           budget: budget.name
         });
@@ -36,7 +37,7 @@ const GoalCelebration = ({ budgets }) => {
       <div className="celebration-content">
         <h3>{celebration.title}</h3>
         <p>{celebration.message}</p>
-        <button onClick={() => setCelebration(null)}>✨ Awesome!</button>
+        <button onClick={() => setCelebration(null)}><SparklesIcon width={16} className="inline" /> Awesome!</button>
       </div>
       <div className="celebration-confetti">
         {[...Array(30)].map((_, i) => (

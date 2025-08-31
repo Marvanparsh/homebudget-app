@@ -20,7 +20,8 @@ const SearchFilter = ({ onSearch, onFilter, budgets = [] }) => {
       <div className="search-box">
         <MagnifyingGlassIcon width={20} />
         <input
-          type="text"
+          id="expense-search"
+          type="search"
           placeholder="Search expenses..."
           value={searchTerm}
           onChange={(e) => handleSearch(e.target.value)}

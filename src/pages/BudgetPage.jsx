@@ -1,8 +1,10 @@
 // rrd imports
 import { useLoaderData } from "react-router-dom";
+import { useState } from "react";
 
 // library
 import { toast } from "react-toastify";
+import { StarIcon, FlagIcon } from "@heroicons/react/24/outline";
 
 // components
 import AddExpenseForm from "../components/AddExpenseForm";
@@ -79,14 +81,28 @@ const BudgetPage = () => {
         <BudgetItem budget={budget} showDelete={true} />
         <AddExpenseForm budgets={[budget]} />
       </div>
-      {expenses && expenses.length > 0 && (
+      {expenses && expenses.length > 0 ? (
         <div className="grid-md">
           <h2>
             <span className="accent">{budget.name}</span> Expenses
           </h2>
           <Table expenses={expenses} showBudget={false} />
         </div>
+      ) : (
+        <div className="no-expenses-encouragement">
+          <div className="encouragement-icon"><StarIcon width={32} /></div>
+          <p>No expenses yet - you're off to a great start!</p>
+          <p className="muted">Add your first expense to start tracking your budget progress.</p>
+        </div>
       )}
+      
+      <div className="encouragement-section">
+        <div className="encouragement-card budget-specific">
+          <div className="encouragement-icon"><FlagIcon width={32} /></div>
+          <h3>Budget Champion!</h3>
+          <p>You're taking control of your <span className="accent">{budget?.name}</span> spending. Smart budgeting leads to financial success!</p>
+        </div>
+      </div>
     </div>
   );
 };

@@ -4,11 +4,9 @@ import React, { useState } from "react";
 
 // library imports
 import { toast } from "react-toastify";
-import { TrashIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, SparklesIcon, FireIcon, LightBulbIcon, FlagIcon, ChartBarIcon, TrophyIcon, BoltIcon } from "@heroicons/react/24/outline";
 
-// hooks
-import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
-import { exportData } from "../utils/dataManager";
+
 
 // components
 import Intro from "../components/Intro";
@@ -23,7 +21,7 @@ import RecurringExpenses from "../components/RecurringExpenses";
 import BudgetTemplates from "../components/BudgetTemplates";
 import FloatingActionButton from "../components/FloatingActionButton";
 import NotificationSystem from "../components/NotificationSystem";
-import ShortcutsHelp from "../components/ShortcutsHelp";
+
 import SpendingHeatmap from "../components/SpendingHeatmap";
 import BudgetHealthScore from "../components/BudgetHealthScore";
 import ExpenseInsights from "../components/ExpenseInsights";
@@ -33,6 +31,8 @@ import GoalCelebration from "../components/GoalCelebration";
 import MobileOptimizations from "../components/MobileOptimizations";
 import ImprovedOnboarding from "../components/ImprovedOnboarding";
 import SmartExpenseSuggestions from "../components/SmartExpenseSuggestions";
+import FinalAchievements from "../components/FinalAchievements";
+import SimpleAchievementBar from "../components/SimpleAchievementBar";
 
 
 //  helper functions
@@ -142,16 +142,7 @@ const Dashboard = () => {
   // Show floating action button only when user has budgets
   const showFAB = budgets && budgets.length > 0;
   
-  // Keyboard shortcuts
-  useKeyboardShortcuts({
-    'ctrl+n': () => setShowQuickExpense(true),
-    'ctrl+b': () => setShowQuickBudget(true),
-    'ctrl+e': () => exportData(),
-    'escape': () => {
-      setShowQuickExpense(false);
-      setShowQuickBudget(false);
-    }
-  });
+
 
   const handleOnboardingComplete = () => {
     localStorage.setItem('onboardingCompleted', 'true');
@@ -214,14 +205,9 @@ const Dashboard = () => {
       
       {currentUser ? (
         <div className="dashboard">
-          <div className="dashboard-header">
-            <h1>
-              Welcome back, <span className="accent">{currentUser.fullName}</span>
-            </h1>
-            <div className="header-actions">
-              <ShortcutsHelp />
-            </div>
-          </div>
+          <h1>
+            Welcome back, <span className="accent">{currentUser.fullName}</span>
+          </h1>
           
           <div className="dashboard-actions">
             {(!expenses || expenses.length === 0) && (!budgets || budgets.length === 0) && (
@@ -283,19 +269,45 @@ const Dashboard = () => {
                         .slice(0, 8)}
                     />
                     {expenses.length > 8 && (
-                      <Link to="expenses" className="btn btn--dark">
+                      <Link to="/dashboard/expenses" className="btn btn--dark">
                         View all expenses
                       </Link>
                     )}
                   </div>
                 )}
+                
+                <div className="encouragement-section">
+                  <div className="encouragement-card">
+                    <div className="encouragement-icon"><TrophyIcon width={32} /></div>
+                    <h3>You're doing great!</h3>
+                    <p>Keep tracking your expenses and you'll reach your financial goals. Every small step counts towards building better money habits!</p>
+                  </div>
+                </div>
+                
+                <SimpleAchievementBar expenses={expenses || []} budgets={budgets || []} />
               </div>
             ) : (
               <div className="grid-sm">
-                <p>Personal budgeting is the secret to financial freedom.</p>
-                <p>Create a budget to get started!</p>
+                <div className="first-budget-encouragement">
+                  <div className="encouragement-icon"><SparklesIcon width={48} /></div>
+                  <h2>Start Your Financial Journey!</h2>
+                  <p>Personal budgeting is the secret to financial freedom.</p>
+                  <p>Create your first budget and take control of your money today!</p>
+                </div>
                 <BudgetTemplates />
                 <AddBudgetForm />
+                
+                <div className="motivation-tips">
+                  <h3><LightBulbIcon width={20} className="inline" /> Quick Tips for Success:</h3>
+                  <ul>
+                    <li><FlagIcon width={16} className="inline" /> Start with one category you spend most on</li>
+                    <li><ChartBarIcon width={16} className="inline" /> Track every expense, no matter how small</li>
+                    <li><TrophyIcon width={16} className="inline" /> Celebrate small wins along the way</li>
+                    <li><BoltIcon width={16} className="inline" /> Stay consistent - you've got this!</li>
+                  </ul>
+                </div>
+                
+                <SimpleAchievementBar expenses={expenses || []} budgets={budgets || []} />
               </div>
             )}
           </div>
