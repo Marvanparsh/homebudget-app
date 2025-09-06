@@ -6,6 +6,7 @@ import darkIllustration from '../assets/dark.webp';
 import wave from '../assets/wave.svg';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
+import SocialLogin from '../components/SocialLogin';
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -141,10 +142,11 @@ const Signup = () => {
                 {isSubmitting ? 'Creating Account...' : 'Create Account'}
               </button>
             </Form>
-            <p>
-              Already have an account?{' '}
-              <Link to="/login">Sign in here</Link> or use Google login
+            <p className="auth-link-text">
+              Already have an account? <Link to="/login" className="auth-link">Sign in here</Link>
             </p>
+            
+            <SocialLogin compact />
             
             <div className="signup-encouragement">
               <div className="encouragement-icon"><RocketLaunchIcon width={32} /></div>

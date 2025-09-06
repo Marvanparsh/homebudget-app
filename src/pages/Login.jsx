@@ -86,9 +86,12 @@ const Login = () => {
             </p>
             
             <SocialLogin />
-            <p>
-              New user? Just use Google login to create an account automatically
-            </p>
+            
+            <div className="auth-footer">
+              <p className="auth-link-text">
+                New user? Just use Google login to create an account automatically
+              </p>
+            </div>
             
             <div className="login-encouragement">
               <div className="encouragement-icon">🌟</div>

@@ -1,6 +1,7 @@
 /* ⚠️ CSS optimized for the tutorial, not for expanding to a larger site. ⚠️ */
 
 @import url('./auth.css');
+@import url('./social-login.css');
 @import url('./landing.css');
 @import url('./encouragement.css');
 @import url('./achievement-velocity.css');
