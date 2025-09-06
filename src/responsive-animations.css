@@ -1,0 +1,584 @@
+/* ===== RESPONSIVE ANIMATIONS AND INTERACTIONS ===== */
+
+/* Animation Variables */
+:root {
+  --animation-duration-fast: 0.15s;
+  --animation-duration-normal: 0.3s;
+  --animation-duration-slow: 0.5s;
+  --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  --animation-easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --animation-easing-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ===== ENTRANCE ANIMATIONS ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===== LOADING ANIMATIONS ===== */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes progressFill {
+  from {
+    width: 0%;
+  }
+  to {
+    width: var(--progress-width, 100%);
+  }
+}
+
+/* ===== INTERACTION ANIMATIONS ===== */
+@keyframes buttonPress {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+@keyframes cardHover {
+  from {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px hsl(var(--muted) / 0.1);
+  }
+  to {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px hsl(var(--muted) / 0.15);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* ===== MOBILE-SPECIFIC ANIMATIONS ===== */
+@keyframes mobileMenuSlide {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes mobileCardSwipe {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100px);
+  }
+}
+
+@keyframes touchFeedback {
+  0% {
+    transform: scale(1);
+    background-color: var(--bg-color, transparent);
+  }
+  50% {
+    transform: scale(0.98);
+    background-color: var(--touch-color, hsl(var(--accent) / 0.1));
+  }
+  100% {
+    transform: scale(1);
+    background-color: var(--bg-color, transparent);
+  }
+}
+
+/* ===== NOTIFICATION ANIMATIONS ===== */
+@keyframes toastSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes achievementPop {
+  0% {
+    transform: scale(0) rotate(-10deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* ===== CHART ANIMATIONS ===== */
+@keyframes chartBarGrow {
+  from {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+  to {
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+}
+
+@keyframes chartLineDrawing {
+  from {
+    stroke-dashoffset: 1000;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes pieSliceReveal {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ===== FORM ANIMATIONS ===== */
+@keyframes inputFocus {
+  from {
+    border-color: hsl(var(--light));
+    box-shadow: none;
+  }
+  to {
+    border-color: hsl(var(--accent));
+    box-shadow: 0 0 0 3px hsl(var(--accent) / 0.1);
+  }
+}
+
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+@keyframes successGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 hsl(120, 70%, 50% / 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px hsl(120, 70%, 50% / 0.1);
+  }
+}
+
+/* ===== ANIMATION CLASSES ===== */
+
+/* Entrance Animations */
+.animate-fade-in {
+  animation: fadeIn var(--animation-duration-normal) var(--animation-easing) forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft var(--animation-duration-normal) var(--animation-easing) forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight var(--animation-duration-normal) var(--animation-easing) forwards;
+}
+
+.animate-slide-in-up {
+  animation: slideInUp var(--animation-duration-normal) var(--animation-easing) forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn var(--animation-duration-normal) var(--animation-easing) forwards;
+}
+
+.animate-bounce-in {
+  animation: bounceIn var(--animation-duration-slow) var(--animation-easing-bounce) forwards;
+}
+
+/* Loading States */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, hsl(var(--light)), hsl(var(--light) / 0.5), hsl(var(--light)));
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Interactive Elements */
+.animate-button-press {
+  animation: buttonPress var(--animation-duration-fast) var(--animation-easing);
+}
+
+.animate-card-hover {
+  transition: all var(--animation-duration-normal) var(--animation-easing);
+}
+
+.animate-card-hover:hover {
+  animation: cardHover var(--animation-duration-normal) var(--animation-easing) forwards;
+}
+
+/* Mobile Specific */
+.animate-mobile-menu {
+  animation: mobileMenuSlide var(--animation-duration-normal) var(--animation-easing) forwards;
+}
+
+.animate-touch-feedback {
+  animation: touchFeedback var(--animation-duration-fast) var(--animation-easing);
+}
+
+/* Form States */
+.animate-input-focus {
+  transition: all var(--animation-duration-fast) var(--animation-easing);
+}
+
+.animate-error-shake {
+  animation: errorShake var(--animation-duration-normal) var(--animation-easing);
+}
+
+.animate-success-glow {
+  animation: successGlow var(--animation-duration-slow) var(--animation-easing);
+}
+
+/* Progress Animations */
+.animate-progress-fill {
+  animation: progressFill var(--animation-duration-slow) var(--animation-easing) forwards;
+}
+
+/* ===== RESPONSIVE ANIMATION ADJUSTMENTS ===== */
+
+/* Tablet Adjustments */
+@media (max-width: 1024px) {
+  :root {
+    --animation-duration-fast: 0.12s;
+    --animation-duration-normal: 0.25s;
+    --animation-duration-slow: 0.4s;
+  }
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  :root {
+    --animation-duration-fast: 0.1s;
+    --animation-duration-normal: 0.2s;
+    --animation-duration-slow: 0.3s;
+  }
+  
+  /* Reduce complex animations on mobile */
+  .animate-card-hover:hover {
+    animation: none;
+    transform: none;
+    box-shadow: 0 2px 8px hsl(var(--muted) / 0.1);
+  }
+  
+  /* Enhance touch feedback */
+  .animate-touch-feedback:active {
+    animation: touchFeedback var(--animation-duration-fast) var(--animation-easing);
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Disable hover animations */
+  .animate-card-hover:hover {
+    animation: none;
+    transform: none;
+  }
+  
+  /* Enhanced touch states */
+  .btn:active,
+  .card:active,
+  .budget-item:active {
+    animation: touchFeedback var(--animation-duration-fast) var(--animation-easing);
+  }
+}
+
+/* ===== STAGGERED ANIMATIONS ===== */
+.stagger-children > * {
+  opacity: 0;
+  animation: fadeIn var(--animation-duration-normal) var(--animation-easing) forwards;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
+
+/* ===== SCROLL ANIMATIONS ===== */
+@keyframes scrollFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scroll-animate {
+  opacity: 0;
+  transition: all var(--animation-duration-normal) var(--animation-easing);
+}
+
+.scroll-animate.in-view {
+  animation: scrollFadeIn var(--animation-duration-normal) var(--animation-easing) forwards;
+}
+
+/* ===== MICRO-INTERACTIONS ===== */
+
+/* Ripple Effect */
+.ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-effect::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.ripple-effect:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Floating Action Button Animation */
+.fab {
+  transition: all var(--animation-duration-normal) var(--animation-easing);
+}
+
+.fab:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 8px 25px hsl(var(--accent) / 0.4);
+}
+
+.fab:active {
+  transform: scale(0.95);
+}
+
+/* Progress Bar Animations */
+.progress-bar {
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: shimmer 2s infinite;
+}
+
+/* ===== PERFORMANCE OPTIMIZATIONS ===== */
+
+/* GPU Acceleration for Smooth Animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Optimize animations for 60fps */
+.smooth-animation {
+  will-change: transform, opacity;
+}
+
+.smooth-animation:hover,
+.smooth-animation:focus,
+.smooth-animation:active {
+  will-change: auto;
+}
+
+/* ===== ACCESSIBILITY ENHANCEMENTS ===== */
+
+/* Focus Animations */
+.focus-ring {
+  transition: box-shadow var(--animation-duration-fast) var(--animation-easing);
+}
+
+.focus-ring:focus-visible {
+  animation: focusRing var(--animation-duration-normal) var(--animation-easing);
+}
+
+@keyframes focusRing {
+  0% {
+    box-shadow: 0 0 0 0 hsl(var(--accent) / 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 3px hsl(var(--accent) / 0.3);
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .animate-shimmer {
+    animation: none;
+    background: hsl(var(--light));
+  }
+  
+  .animate-pulse {
+    animation: none;
+  }
+}
+
+/* ===== DARK MODE ANIMATIONS ===== */
+[data-theme="dark"] .animate-shimmer {
+  background: linear-gradient(90deg, hsl(var(--light)), hsl(var(--light) / 0.3), hsl(var(--light)));
+}
+
+[data-theme="dark"] .ripple-effect::before {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ===== PRINT OPTIMIZATIONS ===== */
+@media print {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

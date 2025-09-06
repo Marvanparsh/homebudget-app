@@ -15,7 +15,9 @@ import AddExpenseForm from "../components/AddExpenseForm";
 import BudgetItem from "../components/BudgetItem";
 import Table from "../components/Table";
 import Analytics from "../components/Analytics";
+import ModernAnalytics from "../components/ModernAnalytics";
 import DataManager from "../components/DataManager";
+
 import SearchFilter from "../components/SearchFilter";
 import RecurringExpenses from "../components/RecurringExpenses";
 import BudgetTemplates from "../components/BudgetTemplates";
@@ -27,12 +29,15 @@ import BudgetHealthScore from "../components/BudgetHealthScore";
 import ExpenseInsights from "../components/ExpenseInsights";
 import ExpenseComparison from "../components/ExpenseComparison";
 import SampleDataButton from "../components/SampleDataButton";
+import EnhancedSampleDataButton from "../components/EnhancedSampleDataButton";
 import GoalCelebration from "../components/GoalCelebration";
 import MobileOptimizations from "../components/MobileOptimizations";
+
 import ImprovedOnboarding from "../components/ImprovedOnboarding";
 import SmartExpenseSuggestions from "../components/SmartExpenseSuggestions";
 import FinalAchievements from "../components/FinalAchievements";
 import SimpleAchievementBar from "../components/SimpleAchievementBar";
+
 
 
 //  helper functions
@@ -44,8 +49,10 @@ import {
   deleteItem,
   fetchData,
   fetchUserData,
+  reorderBudgets,
   waait,
 } from "../helpers";
+import { useDragAndDrop } from "../hooks/useInteractions";
 
 // loader
 export function dashboardLoader() {
@@ -66,12 +73,22 @@ export async function dashboardAction({ request }) {
 
   if (_action === "createBudget") {
     try {
+      const existingBudgets = fetchUserData("budgets") ?? [];
+      const existingBudget = existingBudgets.find(
+        budget => budget.name.toLowerCase() === values.newBudget.toLowerCase().trim()
+      );
+      
       createBudget({
         name: values.newBudget,
         amount: values.newBudgetAmount,
         category: values.newBudgetCategory,
       });
-      return toast.success("Budget created!");
+      
+      if (existingBudget) {
+        return toast.success(`Budget "${values.newBudget}" updated! Amount merged with existing budget.`);
+      } else {
+        return toast.success(`Budget "${values.newBudget}" created!`);
+      }
     } catch (e) {
       return toast.error(e.message);
     }
@@ -118,12 +135,25 @@ export async function dashboardAction({ request }) {
 
   if (_action === "updateBudget") {
     try {
+      const existingBudgets = fetchUserData("budgets") ?? [];
+      const currentBudget = existingBudgets.find(b => b.id === values.budgetId);
+      const duplicateBudget = existingBudgets.find(
+        b => b.id !== values.budgetId && b.name.toLowerCase() === values.budgetName.toLowerCase().trim()
+      );
+      
       updateBudget({
         id: values.budgetId,
         name: values.budgetName,
         amount: values.budgetAmount,
       });
-      return toast.success(`Budget "${values.budgetName}" updated successfully!`);
+      
+      if (duplicateBudget) {
+        return toast.success(`Budgets merged! "${values.budgetName}" amounts combined and expenses transferred.`);
+      } else if (currentBudget && currentBudget.name !== values.budgetName.trim()) {
+        return toast.success(`Budget renamed to "${values.budgetName}" and updated successfully!`);
+      } else {
+        return toast.success(`Budget "${values.budgetName}" updated successfully!`);
+      }
     } catch (e) {
       return toast.error(e.message);
     }
@@ -137,6 +167,18 @@ const Dashboard = () => {
   const [showOnboarding, setShowOnboarding] = useState(() => {
     return !localStorage.getItem('onboardingCompleted') && (!budgets || budgets.length === 0);
   });
+  const [orderedBudgets, setOrderedBudgets] = useState(budgets || []);
+
+  const handleBudgetReorder = (newOrder) => {
+    setOrderedBudgets(newOrder);
+    reorderBudgets(newOrder);
+  };
+
+  const dragHandlers = useDragAndDrop(orderedBudgets, handleBudgetReorder);
+
+  React.useEffect(() => {
+    setOrderedBudgets(budgets || []);
+  }, [budgets]);
 
   
   // Show floating action button only when user has budgets
@@ -175,31 +217,12 @@ const Dashboard = () => {
     }, 100);
   };
 
-  const handleClearAllData = () => {
-    if (window.confirm('Are you sure you want to clear all budgets and expenses? This action cannot be undone.')) {
-      try {
-        const currentUser = fetchData('currentUser');
-        if (currentUser) {
-          // Clear user-specific data
-          localStorage.removeItem(`budgets_${currentUser.id}`);
-          localStorage.removeItem(`expenses_${currentUser.id}`);
-          localStorage.removeItem(`recurringExpenses_${currentUser.id}`);
-          
-          toast.success('All data cleared successfully!');
-          
-          // Refresh the page to update the UI
-          window.location.reload();
-        }
-      } catch (error) {
-        toast.error('Failed to clear data');
-      }
-    }
-  };
+
 
   return (
     <MobileOptimizations>
-      <NotificationSystem budgets={budgets} expenses={expenses} />
-      <GoalCelebration budgets={budgets} />
+        <NotificationSystem budgets={budgets} expenses={expenses} />
+        <GoalCelebration budgets={budgets} />
       
       {showFAB && <FloatingActionButton budgets={budgets} />}
       
@@ -209,25 +232,16 @@ const Dashboard = () => {
             Welcome back, <span className="accent">{currentUser.fullName}</span>
           </h1>
           
-          <div className="dashboard-actions">
-            {(!expenses || expenses.length === 0) && (!budgets || budgets.length === 0) && (
-              <SampleDataButton />
-            )}
-            {((expenses && expenses.length > 0) || (budgets && budgets.length > 0)) && (
-              <button 
-                className="btn btn--warning"
-                onClick={handleClearAllData}
-                title="Clear all budgets and expenses"
-              >
-                <TrashIcon width={16} />
-                Clear All Data
-              </button>
+          <div className="dashboard-header-section">
+            <div className="dashboard-actions">
+              {(!expenses || expenses.length === 0) && (!budgets || budgets.length === 0) && (
+                <EnhancedSampleDataButton />
+              )}
+            </div>
+            {showOnboarding && (
+              <ImprovedOnboarding onComplete={handleOnboardingComplete} />
             )}
           </div>
-          
-          {showOnboarding && (
-            <ImprovedOnboarding onComplete={handleOnboardingComplete} />
-          )}
           
           <div className="grid-sm">
             {budgets && budgets.length > 0 ? (
@@ -239,13 +253,20 @@ const Dashboard = () => {
                   <AddExpenseForm budgets={budgets} />
                 </div>
                 <h2>Existing Budgets</h2>
-                <div className="budgets">
-                  {budgets.map((budget) => (
-                    <BudgetItem key={budget.id} budget={budget} />
+                <div className="budgets draggable-budgets">
+                  {orderedBudgets.map((budget, index) => (
+                    <BudgetItem 
+                      key={budget.id} 
+                      budget={budget} 
+                      index={index}
+                      dragHandlers={dragHandlers}
+                      isDragging={dragHandlers.draggedItem?.item.id === budget.id}
+                      isDragOver={dragHandlers.dragOverIndex === index}
+                    />
                   ))}
                 </div>
                 <div className="dashboard-grid">
-                  <Analytics expenses={expenses || []} budgets={budgets || []} />
+                  <ModernAnalytics expenses={expenses || []} budgets={budgets || []} />
                   
                   <BudgetHealthScore expenses={expenses || []} budgets={budgets || []} />
                   
@@ -296,6 +317,7 @@ const Dashboard = () => {
                 </div>
                 <BudgetTemplates />
                 <AddBudgetForm />
+                <DataManager showImportOnly={true} />
                 
                 <div className="motivation-tips">
                   <h3><LightBulbIcon width={20} className="inline" /> Quick Tips for Success:</h3>

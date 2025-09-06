@@ -1,11 +1,19 @@
 import { toast } from "react-toastify";
+import { fetchData, fetchUserData, setUserData } from "../helpers";
 
 export const exportData = () => {
   try {
+    const currentUser = fetchData("currentUser");
+    if (!currentUser) {
+      toast.error("No user logged in");
+      return;
+    }
+    
     const data = {
-      userName: localStorage.getItem("userName"),
-      budgets: JSON.parse(localStorage.getItem("budgets") || "[]"),
-      expenses: JSON.parse(localStorage.getItem("expenses") || "[]"),
+      user: currentUser,
+      budgets: fetchUserData("budgets") || [],
+      expenses: fetchUserData("expenses") || [],
+      recurringExpenses: fetchUserData("recurringExpenses") || [],
       exportDate: new Date().toISOString()
     };
     
@@ -13,7 +21,7 @@ export const exportData = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `budget-data-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `budget-data-${currentUser.fullName}-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
     
@@ -30,9 +38,16 @@ export const importData = (file) => {
       try {
         const data = JSON.parse(e.target.result);
         
-        if (data.userName) localStorage.setItem("userName", data.userName);
-        if (data.budgets) localStorage.setItem("budgets", JSON.stringify(data.budgets));
-        if (data.expenses) localStorage.setItem("expenses", JSON.stringify(data.expenses));
+        const currentUser = fetchData("currentUser");
+        if (!currentUser) {
+          toast.error("No user logged in");
+          reject(new Error("No user logged in"));
+          return;
+        }
+        
+        if (data.budgets) setUserData("budgets", data.budgets);
+        if (data.expenses) setUserData("expenses", data.expenses);
+        if (data.recurringExpenses) setUserData("recurringExpenses", data.recurringExpenses);
         
         toast.success("Data imported successfully!");
         resolve();

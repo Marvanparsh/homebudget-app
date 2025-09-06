@@ -23,20 +23,19 @@ const AddBudgetForm = () => {
   
   const validateForm = () => {
     const newErrors = {};
-    const existingBudgets = fetchUserData("budgets") ?? [];
     
     // Name validation
     if (!formData.name || formData.name.trim().length === 0) {
       newErrors.name = "Budget name is required";
-    } else if (existingBudgets.find(budget => 
-      budget.name.toLowerCase().trim() === formData.name.toLowerCase().trim()
-    )) {
-      newErrors.name = "A budget with this name already exists";
+    } else if (formData.name.trim().length > 50) {
+      newErrors.name = "Budget name must be 50 characters or less";
     }
     
     // Amount validation
     if (!formData.amount || +formData.amount <= 0) {
       newErrors.amount = "Budget amount must be greater than 0";
+    } else if (+formData.amount > 10000000) {
+      newErrors.amount = "Budget amount cannot exceed ₹1,00,00,000";
     }
     
     setErrors(newErrors);
@@ -91,6 +90,7 @@ const AddBudgetForm = () => {
             onChange={handleInputChange}
             enableVoice={true}
             required
+            maxLength={50}
             ref={focusRef}
             className={errors.name ? 'error' : ''}
             aria-invalid={errors.name ? 'true' : 'false'}

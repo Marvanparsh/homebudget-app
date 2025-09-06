@@ -71,7 +71,7 @@ export const useSwipeGesture = (onSwipeLeft, onSwipeRight) => {
 export const useNotification = () => {
   const [notifications, setNotifications] = useState([]);
   
-  const addNotification = useCallback((message, type = 'info', duration = 3000) => {
+  const addNotification = useCallback((message, type = 'info', duration = 4000) => {
     const id = Date.now();
     const notification = { id, message, type };
     
@@ -82,7 +82,89 @@ export const useNotification = () => {
     }, duration);
   }, []);
   
-  return { notifications, addNotification };
+  const removeNotification = useCallback((id) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  }, []);
+  
+  return { notifications, addNotification, removeNotification };
+};
+
+// Drag and drop hook
+export const useDragAndDrop = (items, onReorder) => {
+  const [draggedItem, setDraggedItem] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+
+  const handleDragStart = useCallback((e, item, index) => {
+    setDraggedItem({ item, index });
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', e.target.outerHTML);
+    e.target.style.opacity = '0.5';
+  }, []);
+
+  const handleDragEnd = useCallback((e) => {
+    e.target.style.opacity = '1';
+    setDraggedItem(null);
+    setDragOverIndex(null);
+  }, []);
+
+  const handleDragOver = useCallback((e, index) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverIndex(index);
+  }, []);
+
+  const handleDrop = useCallback((e, dropIndex) => {
+    e.preventDefault();
+    if (!draggedItem || draggedItem.index === dropIndex) return;
+
+    const newItems = [...items];
+    const [removed] = newItems.splice(draggedItem.index, 1);
+    newItems.splice(dropIndex, 0, removed);
+    
+    onReorder(newItems);
+    setDraggedItem(null);
+    setDragOverIndex(null);
+  }, [draggedItem, items, onReorder]);
+
+  const handleTouchStart = useCallback((e, item, index) => {
+    setDraggedItem({ item, index });
+    e.target.style.opacity = '0.7';
+  }, []);
+
+  const handleTouchMove = useCallback((e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+    const dropTarget = elementBelow?.closest('[data-drop-index]');
+    if (dropTarget) {
+      const index = parseInt(dropTarget.dataset.dropIndex);
+      setDragOverIndex(index);
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback((e) => {
+    e.target.style.opacity = '1';
+    if (dragOverIndex !== null && draggedItem && draggedItem.index !== dragOverIndex) {
+      const newItems = [...items];
+      const [removed] = newItems.splice(draggedItem.index, 1);
+      newItems.splice(dragOverIndex, 0, removed);
+      onReorder(newItems);
+    }
+    setDraggedItem(null);
+    setDragOverIndex(null);
+  }, [draggedItem, dragOverIndex, items, onReorder]);
+
+  return {
+    draggedItem,
+    dragOverIndex,
+    handleDragStart,
+    handleDragEnd,
+    handleDragOver,
+    handleDrop,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd
+  };
 };
 
 // Achievement system hook

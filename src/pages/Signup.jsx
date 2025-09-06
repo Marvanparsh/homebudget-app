@@ -1,18 +1,27 @@
-import React, { useState } from 'react';
-import { Form, Link, useActionData, useNavigation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Form, Link, useActionData, useNavigation, useNavigate } from 'react-router-dom';
 import { EyeIcon, EyeSlashIcon, UserIcon, LockClosedIcon, EnvelopeIcon, IdentificationIcon, RocketLaunchIcon } from '@heroicons/react/24/outline';
 import illustration from '../assets/illustration.jpg';
 import darkIllustration from '../assets/dark.webp';
 import wave from '../assets/wave.svg';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const actionData = useActionData();
   const navigation = useNavigation();
+  const navigate = useNavigate();
   const isSubmitting = navigation.state === 'submitting';
   const { isDark } = useTheme();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
 
   return (
     <div className="layout">
@@ -134,7 +143,7 @@ const Signup = () => {
             </Form>
             <p>
               Already have an account?{' '}
-              <Link to="/login">Sign in here</Link>
+              <Link to="/login">Sign in here</Link> or use Google login
             </p>
             
             <div className="signup-encouragement">

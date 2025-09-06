@@ -1,4 +1,5 @@
 import { fetchData } from '../helpers';
+import { sendVerificationEmail } from './emailService';
 
 // Hash password (simple implementation - in production use bcrypt)
 export const hashPassword = (password) => {
@@ -41,8 +42,9 @@ export const usernameExists = (username) => {
 };
 
 // Create new user
-export const createUser = ({ email, username, password, fullName }) => {
+export const createUser = async ({ email, username, password, fullName }) => {
   const users = fetchData('users') || [];
+  const verificationCode = Math.random().toString(36).substring(2, 8).toUpperCase();
   const newUser = {
     id: crypto.randomUUID(),
     email: email.toLowerCase(),
@@ -50,8 +52,20 @@ export const createUser = ({ email, username, password, fullName }) => {
     fullName,
     password: hashPassword(password),
     createdAt: Date.now(),
-    lastLogin: null
+    lastLogin: null,
+    emailVerified: false,
+    verificationCode
   };
+  
+  // Send verification email
+  try {
+    const result = await sendVerificationEmail(email, verificationCode, fullName);
+    if (!result.success) {
+      console.log(`Email failed, verification code for ${email}: ${verificationCode}`);
+    }
+  } catch (error) {
+    console.log(`Email service error, verification code for ${email}: ${verificationCode}`);
+  }
   
   const updatedUsers = [...users, newUser];
   localStorage.setItem('users', JSON.stringify(updatedUsers));

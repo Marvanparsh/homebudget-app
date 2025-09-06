@@ -61,7 +61,7 @@ const BudgetTemplates = () => {
             <h4>{template.name}</h4>
             <div className="template-preview">
               {template.budgets.map((budget, i) => (
-                <small key={i}>{budget.name}: ${budget.amount}</small>
+                <small key={i}>{budget.name}: ₹{budget.amount}</small>
               ))}
             </div>
             <button 

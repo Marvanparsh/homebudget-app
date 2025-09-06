@@ -9,11 +9,11 @@ const Analytics = ({ expenses, budgets }) => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [viewMode, setViewMode] = useState('overview'); // overview, category, trends
   
-  const categorySpending = useMemo(() => getSpendingByCategory(), [expenses, budgets]);
-  const monthlyTrends = useMemo(() => getMonthlyTrends(), [expenses]);
+  const categorySpending = useMemo(() => getSpendingByCategory(expenses, budgets), [expenses, budgets]);
+  const monthlyTrends = useMemo(() => getMonthlyTrends(expenses), [expenses]);
   
-  const totalSpent = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-  const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
+  const totalSpent = expenses?.reduce((sum, expense) => sum + expense.amount, 0) || 0;
+  const totalBudget = budgets?.reduce((sum, budget) => sum + budget.amount, 0) || 0;
   const savingsRate = totalBudget > 0 ? ((totalBudget - totalSpent) / totalBudget) * 100 : 0;
   
   // Prepare pie chart data
@@ -93,7 +93,8 @@ const Analytics = ({ expenses, budgets }) => {
     const weeklyData = {};
     expenses.forEach(expense => {
       const date = new Date(expense.createdAt);
-      const weekStart = new Date(date.setDate(date.getDate() - date.getDay()));
+      const weekStart = new Date(date.getTime());
+      weekStart.setDate(weekStart.getDate() - weekStart.getDay());
       const weekKey = weekStart.toISOString().split('T')[0];
       weeklyData[weekKey] = (weeklyData[weekKey] || 0) + expense.amount;
     });
@@ -234,31 +235,40 @@ const Analytics = ({ expenses, budgets }) => {
           {pieChartData.length > 0 || lineChartData.length > 0 ? (
             <>
               <div className="charts-grid">
+                {/* Pie Chart Container - 50% width */}
                 {pieChartData.length > 0 && (
-                  <PieChart 
-                    data={pieChartData}
-                    title="Spending by Category"
-                    onSegmentClick={handleCategorySelect}
-                  />
+                  <div className="piechart-container">
+                    <PieChart 
+                      data={pieChartData}
+                      title="Spending by Category"
+                      onSegmentClick={handleCategorySelect}
+                    />
+                  </div>
                 )}
+                
+                {/* Monthly Chart Container - 25% width */}
                 {lineChartData.length > 0 && (
-                  <LineChart 
-                    data={lineChartData}
-                    title="Monthly Spending Trend"
-                    color="hsl(183, 74%, 54%)"
-                  />
+                  <div className="monthly-chart-container">
+                    <LineChart 
+                      data={lineChartData}
+                      title="Monthly Spending Trend"
+                      color="hsl(183, 74%, 54%)"
+                    />
+                  </div>
+                )}
+                
+                {/* Weekly Chart Container - 25% width */}
+                {weeklyTrends.length > 0 && (
+                  <div className="weekly-chart-container">
+                    <LineChart 
+                      data={weeklyTrends}
+                      title="Weekly Spending Pattern"
+                      color="hsl(280, 70%, 60%)"
+                    />
+                  </div>
                 )}
               </div>
-              
-              {weeklyTrends.length > 0 && (
-                <div className="weekly-trends-section">
-                  <LineChart 
-                    data={weeklyTrends}
-                    title="📅 Weekly Spending Pattern"
-                    color="hsl(280, 70%, 60%)"
-                  />
-                </div>
-              )}
+
               
               <SpendingVelocity expenses={expenses} />
               

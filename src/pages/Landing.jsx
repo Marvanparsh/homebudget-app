@@ -1,12 +1,22 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { UserPlusIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import illustration from '../assets/illustration.jpg';
 import darkIllustration from '../assets/dark.webp';
 import wave from '../assets/wave.svg';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
+import { useEffect } from 'react';
 
 const Landing = () => {
   const { isDark } = useTheme();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
   
   return (
     <div className="layout">

@@ -1,0 +1,155 @@
+/* Social Login Styles */
+.social-login {
+  margin-top: -10px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: -8px 0;
+}
+
+.divider span:first-child,
+.divider span:last-child {
+  flex: 1;
+  height: 1px;
+  background: hsl(var(--muted) / 0.3);
+}
+
+.divider span:nth-child(2) {
+  padding: 0 12px;
+  color: hsl(var(--muted));
+  font-size: var(--fs-200);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.social-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 1px solid hsl(var(--light));
+  border-radius: var(--round-md);
+  background: hsl(var(--bkg));
+  color: hsl(var(--text));
+  font-size: var(--fs-300);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.social-btn:hover {
+  background: hsl(var(--light) / 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px hsl(var(--muted) / 0.1);
+}
+
+.social-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.social-btn.google {
+  border-color: #dadce0;
+}
+
+.social-btn.google:hover {
+  background: #f8f9fa;
+}
+
+.social-btn.microsoft {
+  border-color: #8c8c8c;
+}
+
+.social-btn.microsoft:hover {
+  background: #f3f2f1;
+}
+
+.social-btn.apple {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+.social-btn.apple:hover {
+  background: #333;
+}
+
+.social-btn svg {
+  flex-shrink: 0;
+}
+
+/* Sync Indicator Styles */
+.sync-indicator {
+  position: fixed;
+  bottom: var(--space-lg);
+  right: var(--space-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  background: hsl(var(--bkg));
+  border: 1px solid hsl(var(--light));
+  border-radius: var(--round-full);
+  box-shadow: 0 4px 12px hsl(var(--muted) / 0.2);
+  font-size: var(--fs-200);
+  color: hsl(var(--muted));
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+
+.sync-indicator.syncing {
+  background: hsl(200, 70%, 95%);
+  border-color: hsl(200, 70%, 60%);
+  color: hsl(200, 70%, 40%);
+}
+
+.sync-indicator.synced {
+  background: hsl(120, 70%, 95%);
+  border-color: hsl(120, 70%, 60%);
+  color: hsl(120, 70%, 40%);
+}
+
+.sync-icon {
+  display: flex;
+  align-items: center;
+}
+
+.sync-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.sync-icon .spinning {
+  animation: spin 1s linear infinite;
+}
+
+.sync-text {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .social-btn {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--fs-200);
+  }
+  
+  .sync-indicator {
+    bottom: var(--space-md);
+    right: var(--space-md);
+    font-size: var(--fs-100);
+  }
+}

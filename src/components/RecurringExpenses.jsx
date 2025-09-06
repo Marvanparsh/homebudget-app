@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useFetcher } from "react-router-dom";
 import { PlusCircleIcon, ClockIcon } from "@heroicons/react/24/outline";
-import { formatCurrency } from "../helpers";
+import { formatCurrency, fetchUserData } from "../helpers";
 
 const RecurringExpenses = ({ budgets }) => {
   const [showForm, setShowForm] = useState(false);
   const fetcher = useFetcher();
 
-  const recurringExpenses = JSON.parse(localStorage.getItem("recurringExpenses") || "[]");
+  const recurringExpenses = fetchUserData("recurringExpenses") || [];
 
   return (
     <div className="recurring-expenses">

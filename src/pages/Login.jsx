@@ -1,17 +1,27 @@
-import React, { useState } from 'react';
-import { Form, Link, useActionData, useNavigation } from 'react-router-dom';
-import { EyeIcon, EyeSlashIcon, UserIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import React, { useState, useEffect } from 'react';
+import { Form, Link, useActionData, useNavigation, useNavigate } from 'react-router-dom';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import illustration from '../assets/illustration.jpg';
 import darkIllustration from '../assets/dark.webp';
 import wave from '../assets/wave.svg';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
+import SocialLogin from '../components/SocialLogin';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const actionData = useActionData();
   const navigation = useNavigation();
+  const navigate = useNavigate();
   const isSubmitting = navigation.state === 'submitting';
   const { isDark } = useTheme();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
 
   return (
     <div className="layout">
@@ -70,9 +80,14 @@ const Login = () => {
                 {isSubmitting ? 'Signing In...' : 'Sign In'}
               </button>
             </Form>
+            
+            <p className="auth-link-text">
+              Don't have an account? <Link to="/signup" className="auth-link">Sign Up</Link>
+            </p>
+            
+            <SocialLogin />
             <p>
-              Don't have an account?{' '}
-              <Link to="/signup">Sign up here</Link>
+              New user? Just use Google login to create an account automatically
             </p>
             
             <div className="login-encouragement">
@@ -82,7 +97,7 @@ const Login = () => {
               </p>
             </div>
           </div>
-          <img src={isDark ? darkIllustration : illustration} alt="Person with money" width={600} height={400} />
+          <img src={isDark ? darkIllustration : illustration} alt="Person with money" width={500} height={400} style={{objectFit: 'cover'}} />
         </div>
       </main>
       <img src={wave} alt="Decorative wave pattern" />

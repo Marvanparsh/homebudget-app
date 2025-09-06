@@ -47,10 +47,11 @@ const PieChart = ({ data, title, onSegmentClick }) => {
   };
   
   return (
-    <div className="pie-chart-container">
+    <div className="piechart-container">
       <h3 className="chart-title">{title}</h3>
       
-      <div className="pie-chart-wrapper">
+      <div className="piechart-wrapper">
+        {/* Pie Chart Viewbox First */}
         <svg viewBox="0 0 100 100" className="pie-chart">
           {segments.map((segment, index) => (
             <g key={index}>
@@ -103,6 +104,7 @@ const PieChart = ({ data, title, onSegmentClick }) => {
           )}
         </svg>
         
+        {/* Pie Legend Below */}
         <div className="pie-legend">
           {segments.map((segment, index) => (
             <div 

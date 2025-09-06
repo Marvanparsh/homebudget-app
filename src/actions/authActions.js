@@ -75,19 +75,16 @@ export async function signupAction({ request }) {
   }
 
   try {
-    const newUser = createUser({
+    const newUser = await createUser({
       fullName: fullName.trim(),
       email: email.trim(),
       username: username.trim(),
       password
     });
 
-    // Store current user
-    localStorage.setItem('currentUser', JSON.stringify(newUser));
-    window.dispatchEvent(new Event('authChange'));
-    
-    toast.success(`Welcome to HomeBudget, ${newUser.fullName}!`);
-    return redirect('/dashboard');
+    // Don't auto-login, require email verification
+    toast.success('Account created! Please check your email for verification code.');
+    return redirect(`/verify-email?email=${encodeURIComponent(email)}`);
   } catch (error) {
     console.error('Signup error:', error);
     return { error: 'An error occurred during registration. Please try again.' };

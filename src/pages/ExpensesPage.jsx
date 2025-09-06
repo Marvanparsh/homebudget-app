@@ -1,6 +1,6 @@
 // rrd imports
 import { useLoaderData } from "react-router-dom";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 // library import
 import { toast } from "react-toastify";
@@ -48,13 +48,56 @@ const ExpensesPage = () => {
   const { expenses, budgets } = useLoaderData();
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({ budget: "", date: "" });
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const filteredExpenses = useMemo(() => {
-    let result = searchExpenses(expenses, searchTerm);
-    result = filterExpenses(result, filters);
-    return result.sort((a, b) => b.createdAt - a.createdAt);
+    if (!expenses || !Array.isArray(expenses)) return [];
+    
+    return expenses
+      .filter(expense => {
+        // Validate expense object
+        if (!expense || !expense.id) return false;
+        
+        // Search filter
+        if (searchTerm?.trim()) {
+          const name = expense.name?.toLowerCase() || '';
+          const term = searchTerm.trim().toLowerCase();
+          if (!name.includes(term)) return false;
+        }
+        
+        // Budget filter - strict matching
+        if (filters.budget?.trim()) {
+          if (expense.budgetId !== filters.budget.trim()) return false;
+        }
+        
+        // Date filter
+        if (filters.date?.trim()) {
+          const days = parseInt(filters.date.trim());
+          if (days > 0) {
+            const cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
+            if (!expense.createdAt || expense.createdAt < cutoff) return false;
+          }
+        }
+        
+        return true;
+      })
+      .sort((a, b) => b.createdAt - a.createdAt);
   }, [expenses, searchTerm, filters]);
+
+  const totalPages = Math.ceil(filteredExpenses.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedExpenses = filteredExpenses.slice(startIndex, startIndex + itemsPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filters]);
 
   return (
     <div className="grid-lg">
@@ -72,7 +115,35 @@ const ExpensesPage = () => {
             {searchTerm || filters.budget || filters.date ? 'Filtered' : 'All'} Expenses 
             <small>({filteredExpenses.length} of {expenses.length} total)</small>
           </h2>
-          <Table expenses={filteredExpenses} />
+          <Table 
+            key={`${searchTerm}-${filters.budget}-${filters.date}-${currentPage}`}
+            expenses={paginatedExpenses} 
+          />
+          
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button 
+                className="pagination-btn prev" 
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                ‹
+              </button>
+              
+              <div className="pagination-info">
+                <span>Page {currentPage} of {totalPages}</span>
+                <small>Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredExpenses.length)} of {filteredExpenses.length}</small>
+              </div>
+              
+              <button 
+                className="pagination-btn next" 
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                ›
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         <p>{searchTerm || filters.budget || filters.date ? 'No matching expenses found' : 'No Expenses to show'}</p>

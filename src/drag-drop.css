@@ -1,0 +1,117 @@
+/* Drag and Drop Styles */
+.draggable-budgets {
+  position: relative;
+}
+
+.budget {
+  transition: all 0.2s ease;
+  cursor: grab;
+  user-select: none;
+}
+
+.budget:active {
+  cursor: grabbing;
+}
+
+.budget.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+  z-index: 1000;
+  box-shadow: 0 8px 25px hsl(var(--muted) / 0.3);
+}
+
+.budget.drag-over {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px hsl(var(--accent) / 0.4);
+  border: 2px dashed hsl(var(--accent));
+  background: hsl(var(--accent) / 0.1);
+}
+
+/* Mobile touch improvements */
+@media (max-width: 768px) {
+  .budget {
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+  
+  .budget.dragging {
+    opacity: 0.7;
+    transform: scale(0.95);
+  }
+  
+  .budget.drag-over {
+    background: hsl(var(--accent) / 0.15);
+    border: 2px solid hsl(var(--accent));
+  }
+}
+
+/* Drag handle indicator */
+.budget::before {
+  content: "⋮⋮";
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: hsl(var(--muted));
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.budget:hover::before {
+  opacity: 0.6;
+}
+
+.budget.dragging::before {
+  opacity: 0;
+}
+
+/* Adjust budget content to make room for drag handle */
+.budget .progress-text,
+.budget .progress-container,
+.budget .flex-sm {
+  margin-left: 20px;
+}
+
+@media (max-width: 768px) {
+  .budget .progress-text,
+  .budget .progress-container,
+  .budget .flex-sm {
+    margin-left: 15px;
+  }
+}
+
+/* Smooth animations */
+.budgets {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.budget {
+  position: relative;
+  background: hsl(var(--bkg));
+  border-radius: var(--round-lg);
+  padding: 1rem;
+  border: 1px solid hsl(var(--light));
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .budget.drag-over {
+  background: hsl(var(--accent) / 0.2);
+  border-color: hsl(var(--accent));
+  box-shadow: 0 4px 15px hsl(var(--accent) / 0.3);
+}
+
+[data-theme="dark"] .budget.dragging {
+  box-shadow: 0 8px 25px hsl(var(--text) / 0.4);
+}
+
+[data-theme="dark"] .budget::before {
+  color: hsl(var(--muted));
+}

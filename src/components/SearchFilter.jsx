@@ -15,6 +15,14 @@ const SearchFilter = ({ onSearch, onFilter, budgets = [] }) => {
     onFilter({ budget, date });
   };
 
+  const clearFilters = () => {
+    setSearchTerm("");
+    setSelectedBudget("");
+    setDateRange("");
+    onSearch("");
+    onFilter({ budget: "", date: "" });
+  };
+
   return (
     <div className="search-filter">
       <div className="search-box">
@@ -54,6 +62,16 @@ const SearchFilter = ({ onSearch, onFilter, budgets = [] }) => {
           <option value="30">Last 30 days</option>
           <option value="90">Last 3 months</option>
         </select>
+        
+        {(searchTerm || selectedBudget || dateRange) && (
+          <button 
+            className="btn btn--outline" 
+            onClick={clearFilters}
+            title="Clear all filters"
+          >
+            Clear
+          </button>
+        )}
       </div>
     </div>
   );

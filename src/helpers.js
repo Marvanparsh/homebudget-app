@@ -59,6 +59,15 @@ export const deleteItem = ({ key, id }) => {
   try {
     const existingData = fetchUserData(key);
     if (id && existingData) {
+      // Additional validation for budget deletion
+      if (key === "budgets") {
+        const expenses = fetchUserData("expenses") ?? [];
+        const budgetExpenses = expenses.filter(expense => expense.budgetId === id);
+        if (budgetExpenses.length > 0) {
+          throw new Error("Cannot delete budget with existing expenses. Please delete all expenses first.");
+        }
+      }
+      
       const newData = existingData.filter((item) => item.id !== id);
       return setUserData(key, newData);
     }
@@ -81,19 +90,27 @@ export const createBudget = ({ name, amount, category = "other" }) => {
   }
   
   const existingBudgets = fetchUserData("budgets") ?? [];
+  const trimmedName = name.trim();
   
-  // Check for duplicate budget name
-  const duplicateBudget = existingBudgets.find(
-    budget => budget.name.toLowerCase().trim() === name.toLowerCase().trim()
+  // Check if budget with same name exists (case-insensitive)
+  const existingBudget = existingBudgets.find(
+    budget => budget.name.toLowerCase() === trimmedName.toLowerCase()
   );
   
-  if (duplicateBudget) {
-    throw new Error("A budget with this name already exists");
+  if (existingBudget) {
+    // Merge with existing budget by adding amounts
+    const updatedBudgets = existingBudgets.map(budget => 
+      budget.id === existingBudget.id 
+        ? { ...budget, amount: budget.amount + (+amount) }
+        : budget
+    );
+    return setUserData("budgets", updatedBudgets);
   }
   
+  // Create new budget if no duplicate found
   const newItem = {
     id: crypto.randomUUID(),
-    name: name.trim(),
+    name: trimmedName,
     createdAt: Date.now(),
     amount: +amount,
     category,
@@ -115,18 +132,43 @@ export const updateBudget = ({ id, name, amount }) => {
   }
   
   const existingBudgets = fetchUserData("budgets") ?? [];
+  const trimmedName = name.trim();
+  const currentBudget = existingBudgets.find(budget => budget.id === id);
   
-  // Check for duplicate budget name (excluding current budget)
+  if (!currentBudget) {
+    throw new Error("Budget not found");
+  }
+  
+  // Check if another budget with same name exists (excluding current budget)
   const duplicateBudget = existingBudgets.find(
-    budget => budget.id !== id && budget.name.toLowerCase().trim() === name.toLowerCase().trim()
+    budget => budget.id !== id && budget.name.toLowerCase() === trimmedName.toLowerCase()
   );
   
   if (duplicateBudget) {
-    throw new Error("A budget with this name already exists");
+    // Merge budgets: add current budget's amount to duplicate, then remove current
+    const expenses = fetchUserData("expenses") ?? [];
+    
+    // Update expenses to point to the duplicate budget
+    const updatedExpenses = expenses.map(expense => 
+      expense.budgetId === id ? { ...expense, budgetId: duplicateBudget.id } : expense
+    );
+    setUserData("expenses", updatedExpenses);
+    
+    // Merge amounts and remove current budget
+    const updatedBudgets = existingBudgets
+      .map(budget => 
+        budget.id === duplicateBudget.id 
+          ? { ...budget, amount: budget.amount + (+amount) }
+          : budget
+      )
+      .filter(budget => budget.id !== id);
+    
+    return setUserData("budgets", updatedBudgets);
   }
   
+  // No duplicate found, just update the current budget
   const updatedBudgets = existingBudgets.map(budget => 
-    budget.id === id ? { ...budget, name: name.trim(), amount: +amount } : budget
+    budget.id === id ? { ...budget, name: trimmedName, amount: +amount } : budget
   );
   return setUserData("budgets", updatedBudgets);
 };
@@ -144,6 +186,13 @@ export const createExpense = ({ name, amount, budgetId }) => {
   
   if (!budgetId) {
     throw new Error("Please select a budget for this expense");
+  }
+  
+  // Verify budget exists
+  const budgets = fetchUserData("budgets") ?? [];
+  const budget = budgets.find(b => b.id === budgetId);
+  if (!budget) {
+    throw new Error("Selected budget does not exist");
   }
   
   const newItem = {
@@ -222,6 +271,13 @@ export const createRecurringExpense = ({ name, amount, budgetId, frequency }) =>
     throw new Error("Please select a frequency for this recurring expense");
   }
   
+  // Verify budget exists
+  const budgets = fetchUserData("budgets") ?? [];
+  const budget = budgets.find(b => b.id === budgetId);
+  if (!budget) {
+    throw new Error("Selected budget does not exist");
+  }
+  
   const newItem = {
     id: crypto.randomUUID(),
     name: name.trim(),
@@ -281,24 +337,58 @@ export const getMonthlyTrends = (expenses) => {
 
 // Search and filter expenses
 export const searchExpenses = (expenses, searchTerm) => {
-  if (!searchTerm) return expenses;
+  if (!expenses || !Array.isArray(expenses)) return [];
+  if (!searchTerm || !searchTerm.trim()) return expenses;
+  const term = searchTerm.trim().toLowerCase();
   return expenses.filter(expense => 
-    expense.name.toLowerCase().includes(searchTerm.toLowerCase())
+    expense.name && expense.name.toLowerCase().includes(term)
   );
 };
 
 export const filterExpenses = (expenses, { budget, date }) => {
+  if (!expenses || !Array.isArray(expenses)) return [];
+  
   let filtered = [...expenses];
   
-  if (budget) {
-    filtered = filtered.filter(expense => expense.budgetId === budget);
+  if (budget && budget.trim()) {
+    filtered = filtered.filter(expense => expense.budgetId === budget.trim());
   }
   
-  if (date) {
-    const days = parseInt(date);
-    const cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
-    filtered = filtered.filter(expense => expense.createdAt >= cutoff);
+  if (date && date.trim()) {
+    const days = parseInt(date.trim());
+    if (!isNaN(days) && days > 0) {
+      const cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
+      filtered = filtered.filter(expense => 
+        expense.createdAt && expense.createdAt >= cutoff
+      );
+    }
   }
   
   return filtered;
+};
+
+// Reorder budgets
+export const reorderBudgets = (newBudgetOrder) => {
+  try {
+    // Validate that all budgets in the new order exist
+    const existingBudgets = fetchUserData("budgets") ?? [];
+    if (newBudgetOrder.length !== existingBudgets.length) {
+      throw new Error("Invalid budget order: count mismatch");
+    }
+    
+    // Validate all budget IDs exist
+    const existingIds = new Set(existingBudgets.map(b => b.id));
+    const newOrderIds = new Set(newBudgetOrder.map(b => b.id));
+    
+    for (const id of newOrderIds) {
+      if (!existingIds.has(id)) {
+        throw new Error(`Invalid budget order: budget ${id} not found`);
+      }
+    }
+    
+    return setUserData("budgets", newBudgetOrder);
+  } catch (error) {
+    console.error("Error reordering budgets:", error);
+    throw new Error(`Failed to reorder budgets: ${error.message}`);
+  }
 };

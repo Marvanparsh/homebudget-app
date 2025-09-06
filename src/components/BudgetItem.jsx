@@ -13,7 +13,7 @@ import {
   BUDGET_CATEGORIES,
 } from "../helpers";
 
-const BudgetItem = ({ budget, showDelete = false }) => {
+const BudgetItem = ({ budget, showDelete = false, dragHandlers, index, isDragging, isDragOver }) => {
   const { id, name, amount, color, category } = budget;
   const spent = calculateSpentByBudget(id);
   const [isEditing, setIsEditing] = useState(false);
@@ -58,10 +58,19 @@ const BudgetItem = ({ budget, showDelete = false }) => {
 
   return (
     <div
-      className={`budget ${isOverBudget ? 'over-budget' : ''} ${isNearLimit ? 'near-limit' : ''}`}
+      className={`budget ${isOverBudget ? 'over-budget' : ''} ${isNearLimit ? 'near-limit' : ''} ${isDragging ? 'dragging' : ''} ${isDragOver ? 'drag-over' : ''}`}
       style={{
         "--accent": color,
       }}
+      draggable
+      data-drop-index={index}
+      onDragStart={(e) => dragHandlers?.handleDragStart(e, budget, index)}
+      onDragEnd={dragHandlers?.handleDragEnd}
+      onDragOver={(e) => dragHandlers?.handleDragOver(e, index)}
+      onDrop={(e) => dragHandlers?.handleDrop(e, index)}
+      onTouchStart={(e) => dragHandlers?.handleTouchStart(e, budget, index)}
+      onTouchMove={dragHandlers?.handleTouchMove}
+      onTouchEnd={dragHandlers?.handleTouchEnd}
     >
       <div className="progress-text">
         <div className="budget-header">

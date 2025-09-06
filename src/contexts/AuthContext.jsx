@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { fetchData } from '../helpers';
+import { setupAutoSync, signOutFromProviders } from '../utils/socialAuthHelpers';
 
 const AuthContext = createContext();
 
@@ -19,6 +20,9 @@ export const AuthProvider = ({ children }) => {
     const currentUser = fetchData('currentUser');
     setUser(currentUser);
     setLoading(false);
+
+    // Setup auto-sync for social login users
+    setupAutoSync();
 
     // Listen for storage changes (when auth actions update localStorage)
     const handleStorageChange = (e) => {
@@ -49,9 +53,17 @@ export const AuthProvider = ({ children }) => {
     window.dispatchEvent(new Event('authChange'));
   };
 
-  const logout = () => {
+  const logout = async () => {
     setUser(null);
     localStorage.removeItem('currentUser');
+    
+    // Sign out from OAuth providers
+    try {
+      await signOutFromProviders();
+    } catch (error) {
+      console.error('Error signing out from providers:', error);
+    }
+    
     window.dispatchEvent(new Event('authChange'));
   };
 

@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { ArrowDownTrayIcon, ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 import { exportData, importData } from "../utils/dataManager";
 
-const DataManager = ({ onDataImported }) => {
+const DataManager = ({ onDataImported, showImportOnly = false }) => {
   const fileInputRef = useRef();
 
   const handleImport = async (e) => {
@@ -20,15 +20,20 @@ const DataManager = ({ onDataImported }) => {
 
   return (
     <div className="data-manager">
-      <h3>Data Management</h3>
+      <h3>{showImportOnly ? "Import Your Data" : "Data Management"}</h3>
+      {showImportOnly && (
+        <p>Already have budget data? Import your existing data to get started quickly.</p>
+      )}
       <div className="data-actions">
-        <button 
-          className="btn btn--outline" 
-          onClick={exportData}
-        >
-          <ArrowDownTrayIcon width={20} />
-          <span>Export Data</span>
-        </button>
+        {!showImportOnly && (
+          <button 
+            className="btn btn--outline" 
+            onClick={exportData}
+          >
+            <ArrowDownTrayIcon width={20} />
+            <span>Export Data</span>
+          </button>
+        )}
         
         <button 
           className="btn btn--outline"
@@ -37,6 +42,7 @@ const DataManager = ({ onDataImported }) => {
           <ArrowUpTrayIcon width={20} />
           <span>Import Data</span>
         </button>
+        
         
         <input
           ref={fileInputRef}

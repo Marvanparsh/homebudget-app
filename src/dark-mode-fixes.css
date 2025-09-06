@@ -1,0 +1,334 @@
+/* Dark Mode Visibility Fixes */
+
+/* Pagination Dark Mode */
+[data-theme="dark"] .pagination {
+  background: hsl(var(--light) / 0.2);
+  border: 1px solid hsl(var(--light));
+}
+
+[data-theme="dark"] .pagination-btn {
+  background: hsl(var(--bkg));
+  border-color: hsl(var(--accent));
+  color: hsl(var(--accent));
+}
+
+[data-theme="dark"] .pagination-btn:hover:not(:disabled) {
+  background: hsl(var(--accent));
+  color: hsl(var(--bkg));
+}
+
+/* Form Elements Dark Mode */
+[data-theme="dark"] .form-wrapper {
+  background: hsl(var(--bkg));
+  border-top: 0.15em solid hsl(var(--light));
+  border-left: 0.15em solid hsl(var(--light));
+  border-right: 0.15em solid hsl(var(--bkg));
+  border-bottom: 0.15em solid hsl(var(--bkg));
+}
+
+[data-theme="dark"] .form-wrapper::before {
+  border-color: hsl(var(--text));
+}
+
+/* Search Filter Dark Mode */
+[data-theme="dark"] .search-filter {
+  background: hsl(var(--light) / 0.2);
+  border: 1px solid hsl(var(--light));
+}
+
+/* Template Cards Dark Mode */
+[data-theme="dark"] .template-card {
+  background: hsl(var(--bkg));
+  border: 1px solid hsl(var(--light));
+}
+
+[data-theme="dark"] .template-preview {
+  background: hsl(var(--light) / 0.2);
+}
+
+/* Budget Templates Dark Mode */
+[data-theme="dark"] .budget-templates {
+  background: hsl(var(--light) / 0.2);
+}
+
+/* Recurring Expenses Dark Mode */
+[data-theme="dark"] .recurring-expenses {
+  background: hsl(var(--light) / 0.2);
+}
+
+[data-theme="dark"] .recurring-item {
+  background: hsl(var(--bkg));
+  border: 1px solid hsl(var(--light));
+}
+
+/* Data Manager Dark Mode */
+[data-theme="dark"] .data-manager {
+  background: hsl(var(--light) / 0.2);
+}
+
+/* Analytics Dark Mode */
+[data-theme="dark"] .analytics {
+  background: hsl(var(--light) / 0.2);
+}
+
+/* Stat Cards Dark Mode */
+[data-theme="dark"] .stat-card {
+  background: hsl(var(--bkg));
+  border: 1px solid hsl(var(--light));
+}
+
+/* Category Breakdown Dark Mode */
+[data-theme="dark"] .category-breakdown {
+  background: hsl(var(--light) / 0.2);
+}
+
+/* Insight Cards Dark Mode */
+[data-theme="dark"] .insight.warning {
+  background: hsl(var(--warning) / 0.2);
+  color: hsl(var(--warning));
+}
+
+[data-theme="dark"] .insight.success {
+  background: hsl(120, 70%, 20%);
+  color: hsl(120, 70%, 80%);
+}
+
+[data-theme="dark"] .insight.neutral {
+  background: hsl(var(--light) / 0.2);
+  color: hsl(var(--muted));
+}
+
+/* Growth Cards Dark Mode */
+[data-theme="dark"] .growth-card.up {
+  background: hsl(0, 70%, 15%);
+  border-color: hsl(0, 70%, 60%);
+}
+
+[data-theme="dark"] .growth-card.down {
+  background: hsl(120, 70%, 15%);
+  border-color: hsl(120, 70%, 50%);
+}
+
+[data-theme="dark"] .growth-card.stable {
+  background: hsl(var(--light) / 0.1);
+  border-color: hsl(var(--muted));
+}
+
+/* Change Indicators Dark Mode */
+[data-theme="dark"] .change-row.up {
+  background: hsl(0, 70%, 20%);
+  color: hsl(0, 70%, 80%);
+}
+
+[data-theme="dark"] .change-row.down {
+  background: hsl(120, 70%, 20%);
+  color: hsl(120, 70%, 80%);
+}
+
+/* Comparison Cards Dark Mode */
+[data-theme="dark"] .comparison-card {
+  background: hsl(var(--light) / 0.2);
+  border: 2px solid hsl(var(--light));
+}
+
+[data-theme="dark"] .comparison-card.current {
+  border-color: hsl(var(--accent));
+}
+
+[data-theme="dark"] .comparison-card.previous {
+  border-color: hsl(var(--muted));
+}
+
+/* Velocity Cards Dark Mode */
+[data-theme="dark"] .velocity-card {
+  background: hsl(var(--bkg));
+  border: 2px solid hsl(var(--light));
+}
+
+[data-theme="dark"] .velocity-status.active {
+  background: hsl(0, 70%, 20%);
+  color: hsl(0, 70%, 80%);
+}
+
+[data-theme="dark"] .velocity-status.low {
+  background: hsl(120, 70%, 20%);
+  color: hsl(120, 70%, 80%);
+}
+
+/* Spending Velocity Dark Mode */
+[data-theme="dark"] .spending-velocity {
+  background: linear-gradient(135deg, hsl(var(--accent) / 0.1), hsl(280, 70%, 15%));
+  border-color: hsl(var(--accent) / 0.3);
+}
+
+/* Heatmap Dark Mode */
+[data-theme="dark"] .heatmap-tooltip {
+  background: hsl(var(--bkg));
+  color: hsl(var(--text));
+  border: 1px solid hsl(var(--light));
+}
+
+/* Achievement Cards Dark Mode */
+[data-theme="dark"] .achievement-card.locked {
+  background: hsl(var(--light) / 0.1);
+  border-color: hsl(var(--muted) / 0.3);
+}
+
+[data-theme="dark"] .achievement-card.unlocked {
+  background: linear-gradient(135deg, hsl(var(--accent) / 0.2), hsl(var(--accent) / 0.1));
+  border-color: hsl(var(--accent) / 0.4);
+}
+
+/* Modal Dark Mode */
+[data-theme="dark"] .modal-overlay {
+  background: hsl(var(--text) / 0.8);
+}
+
+[data-theme="dark"] .modal-content {
+  background: hsl(var(--bkg));
+  border: 1px solid hsl(var(--light));
+}
+
+/* Encouragement Cards Dark Mode */
+[data-theme="dark"] .encouragement-card {
+  background: linear-gradient(135deg, hsl(var(--accent) / 0.2), hsl(var(--accent) / 0.1));
+  border-color: hsl(var(--accent) / 0.3);
+}
+
+[data-theme="dark"] .no-expenses-encouragement {
+  background: hsl(var(--light) / 0.2);
+}
+
+/* Sample Data Card Dark Mode */
+[data-theme="dark"] .sample-data-card {
+  background: linear-gradient(135deg, hsl(var(--accent) / 0.2), hsl(280, 70%, 15%));
+  border-color: hsl(var(--accent) / 0.4);
+}
+
+[data-theme="dark"] .feature-item {
+  background: hsl(var(--bkg));
+  border-color: hsl(var(--accent) / 0.3);
+}
+
+/* Quick Templates Dark Mode */
+[data-theme="dark"] .quick-templates {
+  background: hsl(var(--light) / 0.2);
+}
+
+[data-theme="dark"] .template-btn {
+  background: hsl(var(--bkg));
+  border: 1px solid hsl(var(--light));
+}
+
+[data-theme="dark"] .template-btn:hover {
+  background: hsl(var(--accent));
+  color: hsl(var(--bkg));
+}
+
+/* Smart Suggestions Dark Mode */
+[data-theme="dark"] .smart-suggestions {
+  background: hsl(var(--bkg));
+  border: 1px solid hsl(var(--light));
+}
+
+[data-theme="dark"] .suggestion-card {
+  background: hsl(var(--light) / 0.1);
+  border-color: hsl(var(--accent) / 0.3);
+}
+
+[data-theme="dark"] .suggestion-card:hover {
+  background: hsl(var(--accent) / 0.2);
+  border-color: hsl(var(--accent));
+}
+
+[data-theme="dark"] .time-suggestion {
+  background: hsl(var(--accent) / 0.2);
+  border-color: hsl(var(--accent));
+}
+
+[data-theme="dark"] .quick-amount-btn {
+  background: hsl(var(--light) / 0.1);
+  border-color: hsl(var(--accent) / 0.4);
+}
+
+[data-theme="dark"] .quick-amount-btn:hover {
+  background: hsl(var(--accent));
+  color: hsl(var(--bkg));
+}
+
+/* Table Dark Mode */
+[data-theme="dark"] tr:nth-child(odd) {
+  background-color: hsl(var(--accent) / 0.08);
+}
+
+[data-theme="dark"] tr:hover {
+  background: hsl(var(--accent) / 0.1);
+}
+
+/* Progress Elements Dark Mode */
+[data-theme="dark"] progress[value]::-webkit-progress-bar {
+  background-color: hsl(var(--light));
+}
+
+/* Shortcut Modal Dark Mode */
+[data-theme="dark"] .shortcuts-content {
+  background: hsl(var(--bkg));
+  border: 1px solid hsl(var(--light));
+}
+
+[data-theme="dark"] .shortcut-item {
+  background: hsl(var(--light) / 0.2);
+}
+
+[data-theme="dark"] .shortcut-key {
+  background: hsl(var(--text));
+  color: hsl(var(--bkg));
+}
+
+/* Charts Dark Mode */
+[data-theme="dark"] .monthly-chart-container,
+[data-theme="dark"] .weekly-chart-container {
+  background: hsl(var(--bkg));
+  border: 1px solid hsl(var(--light));
+}
+
+[data-theme="dark"] .chart-line {
+  stroke: hsl(var(--accent));
+}
+
+[data-theme="dark"] .chart-area {
+  fill: hsl(var(--accent) / 0.1);
+}
+
+[data-theme="dark"] .chart-point {
+  fill: hsl(var(--accent));
+  stroke: hsl(var(--bkg));
+}
+
+[data-theme="dark"] .y-label,
+[data-theme="dark"] .x-label {
+  fill: hsl(var(--muted));
+  color: hsl(var(--muted));
+}
+
+/* Onboarding Dark Mode */
+[data-theme="dark"] .onboarding-tooltip {
+  background: hsl(var(--bkg));
+  border: 1px solid hsl(var(--light));
+}
+
+[data-theme="dark"] .onboarding-tooltip.bottom .onboarding-arrow {
+  border-bottom-color: hsl(var(--bkg));
+}
+
+[data-theme="dark"] .onboarding-tooltip.top .onboarding-arrow {
+  border-top-color: hsl(var(--bkg));
+}
+
+[data-theme="dark"] .onboarding-tooltip.left .onboarding-arrow {
+  border-left-color: hsl(var(--bkg));
+}
+
+[data-theme="dark"] .onboarding-tooltip.right .onboarding-arrow {
+  border-right-color: hsl(var(--bkg));
+}

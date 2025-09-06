@@ -1,0 +1,45 @@
+{
+  "exportDate": "2024-01-15T10:30:00.000Z",
+  "userId": "demo-user-123",
+  "lastUpdated": 1705315800000,
+  "version": 1,
+  "budgets": [
+    {
+      "id": "budget-1",
+      "name": "Groceries",
+      "amount": 15000,
+      "category": "food",
+      "color": "0 65% 50%",
+      "createdAt": 1705228800000
+    },
+    {
+      "id": "budget-2", 
+      "name": "Transportation",
+      "amount": 8000,
+      "category": "transport",
+      "color": "34 65% 50%",
+      "createdAt": 1705228800000
+    }
+  ],
+  "expenses": [
+    {
+      "id": "expense-1",
+      "name": "Weekly Groceries",
+      "amount": 3500,
+      "budgetId": "budget-1",
+      "createdAt": 1705315200000
+    },
+    {
+      "id": "expense-2",
+      "name": "Bus Pass",
+      "amount": 2000,
+      "budgetId": "budget-2", 
+      "createdAt": 1705315200000
+    }
+  ],
+  "recurringExpenses": [],
+  "userPreferences": {
+    "theme": "light",
+    "currency": "INR"
+  }
+}

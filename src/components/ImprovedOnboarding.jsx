@@ -8,27 +8,27 @@ const ImprovedOnboarding = ({ onComplete }) => {
   const steps = [
     {
       id: 'welcome',
-      title: 'Welcome to Your Financial Journey!',
+      title: 'Welcome to Smart Budgeting!',
       icon: <FlagIcon width={24} />,
-      description: 'Take control of your money with smart budgeting',
-      action: 'Get Started',
-      tips: ['Track every expense', 'Set realistic budgets', 'Review weekly']
+      description: 'Transform your financial habits with intelligent tracking and insights',
+      action: 'Start Journey',
+      tips: ['See where every dollar goes', 'Get AI-powered insights', 'Build lasting money habits']
     },
     {
       id: 'budget',
-      title: 'Create Your First Budget',
+      title: 'Set Up Your First Budget',
       icon: <CurrencyDollarIcon width={24} />,
-      description: 'Start with categories like Food, Transport, Entertainment',
+      description: 'Choose from templates or create custom categories that match your lifestyle',
       action: 'Create Budget',
-      tips: ['Use the 50/30/20 rule', 'Start small', 'Be realistic']
+      tips: ['Try the 50/30/20 rule (needs/wants/savings)', 'Start with your biggest expense category', 'You can always adjust amounts later']
     },
     {
       id: 'expense',
-      title: 'Add Your First Expense',
+      title: 'Track Your First Expense',
       icon: <BoltIcon width={24} />,
-      description: 'Quick entry with voice input and templates',
+      description: 'Experience smart suggestions, quick templates, and instant categorization',
       action: 'Add Expense',
-      tips: ['Use quick templates', 'Voice input available', 'Auto-categorization']
+      tips: ['Use voice input for hands-free entry', 'Smart suggestions learn your patterns', 'Photos automatically extract receipt data']
     }
   ];
 

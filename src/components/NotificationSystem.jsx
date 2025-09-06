@@ -4,7 +4,16 @@ import { useNotification } from '../hooks/useInteractions';
 import { calculateSpentByBudget } from '../helpers';
 
 const NotificationSystem = ({ budgets, expenses }) => {
-  const { notifications, addNotification } = useNotification();
+  const { notifications, addNotification, removeNotification } = useNotification();
+  
+  useEffect(() => {
+    notifications.forEach(notification => {
+      const timer = setTimeout(() => {
+        removeNotification(notification.id);
+      }, 4000);
+      return () => clearTimeout(timer);
+    });
+  }, [notifications, removeNotification]);
   
   useEffect(() => {
     const shownNotifications = JSON.parse(localStorage.getItem('shownNotifications') || '[]');

@@ -3,7 +3,7 @@ import { formatCurrency } from '../helpers';
 
 const SpendingHeatmap = ({ expenses }) => {
   const [hoveredDay, setHoveredDay] = useState(null);
-  const [timePeriod, setTimePeriod] = useState('year');
+  const [timePeriod, setTimePeriod] = useState('month');
   
   const heatmapData = useMemo(() => {
     const today = new Date();

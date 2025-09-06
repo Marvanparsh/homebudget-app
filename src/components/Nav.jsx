@@ -11,7 +11,10 @@ import {
   EnvelopeIcon,
   KeyIcon,
   ArrowRightOnRectangleIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  ChatBubbleLeftRightIcon,
+  CloudArrowUpIcon,
+  CloudArrowDownIcon
 } from '@heroicons/react/24/solid'
 
 // assets
@@ -19,6 +22,7 @@ import logomark from "../assets/logomark.svg"
 
 // components
 import ThemeToggle from "./ThemeToggle"
+import { syncToGoogleDrive, syncFromGoogleDrive } from '../utils/googleDriveSync'
 
 const Nav = ({ currentUser }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -58,7 +62,7 @@ const Nav = ({ currentUser }) => {
     <nav className="navbar">
       <div className="nav-container">
         <NavLink
-          to="/"
+          to={currentUser ? "/dashboard" : "/"}
           aria-label="Go to home"
           className="nav-logo"
           onClick={() => {
@@ -134,6 +138,71 @@ const Nav = ({ currentUser }) => {
                         <div className="item-content">
                           <span className="item-title">Change Password</span>
                           <small className="item-desc">Update your security</small>
+                        </div>
+                      </button>
+                      
+                      <button className="dropdown-item sync-item" onClick={async () => {
+                        setIsUserDropdownOpen(false);
+                        const success = await syncToGoogleDrive();
+                        alert(success ? 'Data synced to Google Drive!' : 'Sync failed. Please try again.');
+                      }}>
+                        <CloudArrowUpIcon width={18} />
+                        <div className="item-content">
+                          <span className="item-title">Sync to Drive</span>
+                          <small className="item-desc">Upload data to Google Drive</small>
+                        </div>
+                      </button>
+                      
+                      <button className="dropdown-item sync-item" onClick={async () => {
+                        setIsUserDropdownOpen(false);
+                        const success = await syncFromGoogleDrive();
+                        if (success) {
+                          alert('Data restored from Google Drive!');
+                          window.location.reload();
+                        } else {
+                          alert('No data found in Google Drive or sync failed.');
+                        }
+                      }}>
+                        <CloudArrowDownIcon width={18} />
+                        <div className="item-content">
+                          <span className="item-title">Restore from Drive</span>
+                          <small className="item-desc">Download data from Google Drive</small>
+                        </div>
+                      </button>
+                      
+                      <button className="dropdown-item contact-item" onClick={() => {
+                        setIsUserDropdownOpen(false);
+                        const subject = 'HomeBudget Support Request';
+                        const body = `Hi HomeBudget Support Team,\n\nI need help with:\n\n[Please describe your issue here]\n\nUser: ${currentUser.fullName}\nEmail: ${currentUser.email}\n\nThank you!`;
+                        window.open(`mailto:help.homebudget@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+                      }}>
+                        <ChatBubbleLeftRightIcon width={18} />
+                        <div className="item-content">
+                          <span className="item-title">Contact Us</span>
+                          <small className="item-desc">Get help and support</small>
+                        </div>
+                      </button>
+                      
+                      <button className="dropdown-item danger" onClick={() => {
+                        setIsUserDropdownOpen(false);
+                        if (window.confirm('Are you sure you want to clear all budgets and expenses? This action cannot be undone.')) {
+                          try {
+                            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                            if (currentUser) {
+                              localStorage.removeItem(`budgets_${currentUser.id}`);
+                              localStorage.removeItem(`expenses_${currentUser.id}`);
+                              localStorage.removeItem(`recurringExpenses_${currentUser.id}`);
+                              window.location.reload();
+                            }
+                          } catch (error) {
+                            alert('Failed to clear data');
+                          }
+                        }
+                      }}>
+                        <TrashIcon width={18} />
+                        <div className="item-content">
+                          <span className="item-title">Clear All Data</span>
+                          <small className="item-desc">Remove all budgets & expenses</small>
                         </div>
                       </button>
                       

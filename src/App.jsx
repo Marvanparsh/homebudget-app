@@ -1,4 +1,4 @@
-import { createHashRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 // Library
 import { ToastContainer } from "react-toastify";
@@ -7,6 +7,8 @@ import "react-toastify/dist/ReactToastify.css";
 // Components
 import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ScrollToTop from "./components/ScrollToTop";
+import SyncIndicator from "./components/SyncIndicator";
 
 // Contexts
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -14,6 +16,16 @@ import { AuthProvider } from "./contexts/AuthContext";
 
 // Layouts
 import Main, { mainLoader } from "./layouts/Main";
+
+// Wrapper component for ScrollToTop
+const AppWithScrollToTop = () => {
+  return (
+    <>
+      <ScrollToTop />
+      <Main />
+    </>
+  );
+};
 
 // Actions
 import { logoutAction, deleteAccountAction } from "./actions/logout";
@@ -31,8 +43,10 @@ import ExpensesPage, {
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Landing from "./pages/Landing";
+import AuthCallback from "./pages/AuthCallback";
+import VerifyEmail from "./pages/VerifyEmail";
 
-const router = createHashRouter([
+const router = createBrowserRouter([
   {
     path: "/",
     element: <Landing />,
@@ -56,10 +70,21 @@ const router = createHashRouter([
     errorElement: <Error />,
   },
   {
+    path: "/auth/callback",
+    element: <AuthCallback />,
+    errorElement: <Error />,
+  },
+  {
+    path: "/verify-email",
+    element: <VerifyEmail />,
+    errorElement: <Error />,
+  },
+
+  {
     path: "/dashboard",
     element: (
       <ProtectedRoute>
-        <Main />
+        <AppWithScrollToTop />
       </ProtectedRoute>
     ),
     loader: mainLoader,
@@ -100,6 +125,7 @@ const router = createHashRouter([
         path: "delete-account",
         action: deleteAccountAction,
       },
+
     ],
   },
 ]);
@@ -112,6 +138,7 @@ function App() {
           <div className="App">
             <RouterProvider router={router} />
             <ToastContainer />
+            <SyncIndicator />
           </div>
         </ErrorBoundary>
       </ThemeProvider>
