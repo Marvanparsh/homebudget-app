@@ -2,52 +2,44 @@
   "name": "Smart Budget Tracker - Personal Finance Manager",
   "short_name": "BudgetTracker",
   "description": "Take control of your finances with smart budgeting, AI suggestions, and comprehensive expense tracking",
-  "start_url": "./",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#f0f9ff",
   "theme_color": "#6366f1",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "./favicon.svg",
+      "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ],
   "categories": ["finance", "productivity", "utilities"],
-  "screenshots": [
-    {
-      "src": "./favicon.svg",
-      "sizes": "540x720",
-      "type": "image/svg+xml",
-      "form_factor": "narrow"
-    }
-  ],
   "shortcuts": [
     {
       "name": "Quick Add Expense",
       "short_name": "Add Expense",
       "description": "Quickly add a new expense with smart suggestions",
-      "url": "./?action=add-expense",
-      "icons": [{ "src": "./favicon.svg", "sizes": "96x96" }]
+      "url": "/?action=add-expense",
+      "icons": [{ "src": "/favicon.svg", "sizes": "96x96" }]
     },
     {
       "name": "View Analytics",
       "short_name": "Analytics",
       "description": "View detailed spending analytics and insights",
-      "url": "./?view=analytics",
-      "icons": [{ "src": "./favicon.svg", "sizes": "96x96" }]
+      "url": "/?view=analytics",
+      "icons": [{ "src": "/favicon.svg", "sizes": "96x96" }]
     },
     {
       "name": "Create Budget",
       "short_name": "New Budget",
       "description": "Create a new budget category",
-      "url": "./?action=create-budget",
-      "icons": [{ "src": "./favicon.svg", "sizes": "96x96" }]
+      "url": "/?action=create-budget",
+      "icons": [{ "src": "/favicon.svg", "sizes": "96x96" }]
     }
   ],
   "prefer_related_applications": false,
   "lang": "en",
-  "scope": "./"
+  "scope": "/"
 }

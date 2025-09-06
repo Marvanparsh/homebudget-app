@@ -128,9 +128,7 @@ const router = createBrowserRouter([
 
     ],
   },
-], {
-  basename: import.meta.env.PROD ? '/homebudget-app' : '/'
-});
+]);
 
 function App() {
   return (
