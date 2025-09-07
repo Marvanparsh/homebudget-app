@@ -6,17 +6,20 @@ const DATA_FILE_NAME = 'budget-data.json';
 
 // Initialize Google Drive API
 const initGoogleDrive = () => {
-  return new Promise((resolve) => {
-    if (window.gapi) {
-      window.gapi.load('client:auth2', () => {
-        window.gapi.client.init({
-          apiKey: process.env.REACT_APP_GOOGLE_API_KEY,
-          clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-          discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
-          scope: 'https://www.googleapis.com/auth/drive.file'
-        }).then(resolve);
-      });
+  return new Promise((resolve, reject) => {
+    if (!window.gapi) {
+      reject(new Error('Google API not loaded'));
+      return;
     }
+    
+    window.gapi.load('client:auth2', () => {
+      window.gapi.client.init({
+        apiKey: import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY || process.env.REACT_APP_GOOGLE_API_KEY,
+        clientId: import.meta.env.VITE_REACT_APP_GOOGLE_CLIENT_ID || process.env.REACT_APP_GOOGLE_CLIENT_ID,
+        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+        scope: 'https://www.googleapis.com/auth/drive.file'
+      }).then(resolve).catch(reject);
+    });
   });
 };
 
@@ -45,10 +48,20 @@ const getOrCreateFolder = async () => {
 // Upload data to Google Drive
 export const syncToGoogleDrive = async () => {
   try {
+    // Check if Google API is loaded
+    if (!window.gapi) {
+      throw new Error('Google API not loaded. Please refresh the page.');
+    }
+
     await initGoogleDrive();
     
-    if (!window.gapi.auth2.getAuthInstance().isSignedIn.get()) {
-      await window.gapi.auth2.getAuthInstance().signIn();
+    const authInstance = window.gapi.auth2.getAuthInstance();
+    if (!authInstance) {
+      throw new Error('Google Auth not initialized');
+    }
+    
+    if (!authInstance.isSignedIn.get()) {
+      await authInstance.signIn();
     }
 
     const folderId = await getOrCreateFolder();
@@ -100,17 +113,32 @@ export const syncToGoogleDrive = async () => {
     return true;
   } catch (error) {
     console.error('Google Drive sync failed:', error);
-    return false;
+    if (error.error === 'popup_blocked_by_browser') {
+      throw new Error('Popup blocked. Please allow popups for this site.');
+    } else if (error.error === 'access_denied') {
+      throw new Error('Access denied. Please grant Google Drive permissions.');
+    } else {
+      throw new Error(error.message || 'Sync failed. Please try again.');
+    }
   }
 };
 
 // Download data from Google Drive
 export const syncFromGoogleDrive = async () => {
   try {
+    if (!window.gapi) {
+      throw new Error('Google API not loaded. Please refresh the page.');
+    }
+
     await initGoogleDrive();
     
-    if (!window.gapi.auth2.getAuthInstance().isSignedIn.get()) {
-      return false;
+    const authInstance = window.gapi.auth2.getAuthInstance();
+    if (!authInstance) {
+      throw new Error('Google Auth not initialized');
+    }
+    
+    if (!authInstance.isSignedIn.get()) {
+      await authInstance.signIn();
     }
 
     const folderId = await getOrCreateFolder();
@@ -121,7 +149,7 @@ export const syncFromGoogleDrive = async () => {
     });
 
     if (files.result.files.length === 0) {
-      return false;
+      throw new Error('No backup data found in Google Drive');
     }
 
     const fileId = files.result.files[0].id;
@@ -138,7 +166,13 @@ export const syncFromGoogleDrive = async () => {
     return true;
   } catch (error) {
     console.error('Google Drive sync failed:', error);
-    return false;
+    if (error.error === 'popup_blocked_by_browser') {
+      throw new Error('Popup blocked. Please allow popups for this site.');
+    } else if (error.error === 'access_denied') {
+      throw new Error('Access denied. Please grant Google Drive permissions.');
+    } else {
+      throw new Error(error.message || 'Download failed. Please try again.');
+    }
   }
 };
 
@@ -149,8 +183,8 @@ export const enableAutoSync = () => {
   const autoSync = () => {
     clearTimeout(syncTimeout);
     syncTimeout = setTimeout(() => {
-      syncToGoogleDrive();
-    }, 5000); // Sync 5 seconds after last change
+      syncToGoogleDrive().catch(console.error);
+    }, 5000);
   };
 
   // Override setUserData to trigger auto-sync

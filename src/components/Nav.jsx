@@ -23,6 +23,7 @@ import logomark from "../assets/logomark.svg"
 // components
 import ThemeToggle from "./ThemeToggle"
 import { syncToGoogleDrive, syncFromGoogleDrive } from '../utils/googleDriveSync'
+import { exportToFile, importFromFile } from '../utils/localSync'
 
 const Nav = ({ currentUser }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -30,6 +31,7 @@ const Nav = ({ currentUser }) => {
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [showEmailModal, setShowEmailModal] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [showScrollIndicator, setShowScrollIndicator] = useState(true)
   const [emailPrefs, setEmailPrefs] = useState(() => {
     const saved = localStorage.getItem('emailPreferences')
     return saved ? JSON.parse(saved) : {
@@ -39,6 +41,7 @@ const Nav = ({ currentUser }) => {
     }
   })
   const dropdownRef = useRef(null)
+  const dropdownContentRef = useRef(null)
   
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -51,6 +54,29 @@ const Nav = ({ currentUser }) => {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+  
+  // Handle scroll indicator visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      if (dropdownContentRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } = dropdownContentRef.current
+        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10
+        setShowScrollIndicator(!isAtBottom)
+      }
+    }
+    
+    if (isUserDropdownOpen && dropdownContentRef.current) {
+      dropdownContentRef.current.addEventListener('scroll', handleScroll)
+      // Check initial state
+      handleScroll()
+      
+      return () => {
+        if (dropdownContentRef.current) {
+          dropdownContentRef.current.removeEventListener('scroll', handleScroll)
+        }
+      }
+    }
+  }, [isUserDropdownOpen])
   
   // Get user initials for avatar
   const getUserInitials = (name) => {
@@ -103,7 +129,9 @@ const Nav = ({ currentUser }) => {
                 </button>
                 
                 {isUserDropdownOpen && (
-                  <div className="user-dropdown">
+                  <>
+                    <div className="dropdown-backdrop" onClick={() => setIsUserDropdownOpen(false)}></div>
+                    <div className="user-dropdown" ref={dropdownContentRef}>
                     <div className="dropdown-header">
                       <div className="user-avatar large">
                         {getUserInitials(currentUser.fullName)}
@@ -117,121 +145,219 @@ const Nav = ({ currentUser }) => {
                     <div className="dropdown-divider"></div>
                     
                     <div className="dropdown-menu">
-                      <button className="dropdown-item profile-item" onClick={() => { setShowProfileModal(true); setIsUserDropdownOpen(false); }}>
-                        <UserIcon width={18} />
-                        <div className="item-content">
-                          <span className="item-title">Profile Settings</span>
-                          <small className="item-desc">Manage your account details</small>
-                        </div>
-                      </button>
+                      {/* Account Section */}
+                      <div className="dropdown-section">
+                        <h4 className="section-title">Account</h4>
+                        <button className="dropdown-item profile-item" onClick={() => { setShowProfileModal(true); setIsUserDropdownOpen(false); }}>
+                          <UserIcon width={18} />
+                          <div className="item-content">
+                            <span className="item-title">Profile Settings</span>
+                            <small className="item-desc">Manage your account details</small>
+                          </div>
+                        </button>
+                        
+                        <button className="dropdown-item email-item" onClick={() => { setShowEmailModal(true); setIsUserDropdownOpen(false); }}>
+                          <EnvelopeIcon width={18} />
+                          <div className="item-content">
+                            <span className="item-title">Email Preferences</span>
+                            <small className="item-desc">Notification settings</small>
+                          </div>
+                        </button>
+                        
+                        <button className="dropdown-item password-item" onClick={() => { setShowPasswordModal(true); setIsUserDropdownOpen(false); }}>
+                          <KeyIcon width={18} />
+                          <div className="item-content">
+                            <span className="item-title">Change Password</span>
+                            <small className="item-desc">Update your security</small>
+                          </div>
+                        </button>
+                      </div>
                       
-                      <button className="dropdown-item email-item" onClick={() => { setShowEmailModal(true); setIsUserDropdownOpen(false); }}>
-                        <EnvelopeIcon width={18} />
-                        <div className="item-content">
-                          <span className="item-title">Email Preferences</span>
-                          <small className="item-desc">Notification settings</small>
+                      {/* Data Management Section */}
+                      <div className="dropdown-section">
+                        <h4 className="section-title">Data</h4>
+                        <div className="last-sync-info">
+                          <small>Last sync: {localStorage.getItem('lastSyncTime') ? new Date(localStorage.getItem('lastSyncTime')).toLocaleString() : 'Never'}</small>
                         </div>
-                      </button>
-                      
-                      <button className="dropdown-item password-item" onClick={() => { setShowPasswordModal(true); setIsUserDropdownOpen(false); }}>
-                        <KeyIcon width={18} />
-                        <div className="item-content">
-                          <span className="item-title">Change Password</span>
-                          <small className="item-desc">Update your security</small>
-                        </div>
-                      </button>
-                      
-                      <button className="dropdown-item sync-item" onClick={async () => {
-                        setIsUserDropdownOpen(false);
-                        const success = await syncToGoogleDrive();
-                        alert(success ? 'Data synced to Google Drive!' : 'Sync failed. Please try again.');
-                      }}>
-                        <CloudArrowUpIcon width={18} />
-                        <div className="item-content">
-                          <span className="item-title">Sync to Drive</span>
-                          <small className="item-desc">Upload data to Google Drive</small>
-                        </div>
-                      </button>
-                      
-                      <button className="dropdown-item sync-item" onClick={async () => {
-                        setIsUserDropdownOpen(false);
-                        const success = await syncFromGoogleDrive();
-                        if (success) {
-                          alert('Data restored from Google Drive!');
-                          window.location.reload();
-                        } else {
-                          alert('No data found in Google Drive or sync failed.');
-                        }
-                      }}>
-                        <CloudArrowDownIcon width={18} />
-                        <div className="item-content">
-                          <span className="item-title">Restore from Drive</span>
-                          <small className="item-desc">Download data from Google Drive</small>
-                        </div>
-                      </button>
-                      
-                      <button className="dropdown-item contact-item" onClick={() => {
-                        setIsUserDropdownOpen(false);
-                        const subject = 'HomeBudget Support Request';
-                        const body = `Hi HomeBudget Support Team,\n\nI need help with:\n\n[Please describe your issue here]\n\nUser: ${currentUser.fullName}\nEmail: ${currentUser.email}\n\nThank you!`;
-                        window.open(`mailto:help.homebudget@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
-                      }}>
-                        <ChatBubbleLeftRightIcon width={18} />
-                        <div className="item-content">
-                          <span className="item-title">Contact Us</span>
-                          <small className="item-desc">Get help and support</small>
-                        </div>
-                      </button>
-                      
-                      <button className="dropdown-item danger" onClick={() => {
-                        setIsUserDropdownOpen(false);
-                        if (window.confirm('Are you sure you want to clear all budgets and expenses? This action cannot be undone.')) {
+                        <button className="dropdown-item sync-item" onClick={async () => {
+                          setIsUserDropdownOpen(false);
                           try {
-                            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-                            if (currentUser) {
-                              localStorage.removeItem(`budgets_${currentUser.id}`);
-                              localStorage.removeItem(`expenses_${currentUser.id}`);
-                              localStorage.removeItem(`recurringExpenses_${currentUser.id}`);
-                              window.location.reload();
+                            // Try Google Drive first, fallback to file export
+                            try {
+                              const success = await syncToGoogleDrive();
+                              if (success) {
+                                localStorage.setItem('lastSyncTime', new Date().toISOString());
+                                const notification = document.createElement('div');
+                                notification.className = 'sync-notification success';
+                                notification.innerHTML = '✅ Data synced to Google Drive successfully!';
+                                document.body.appendChild(notification);
+                                setTimeout(() => notification.remove(), 3000);
+                                return;
+                              }
+                            } catch (driveError) {
+                              console.log('Google Drive failed, using file export:', driveError);
+                            }
+                            
+                            // Fallback to file export
+                            if (window.confirm('Google Drive sync failed. Would you like to download a backup file instead?')) {
+                              const success = exportToFile();
+                              if (success) {
+                                localStorage.setItem('lastSyncTime', new Date().toISOString());
+                                const notification = document.createElement('div');
+                                notification.className = 'sync-notification success';
+                                notification.innerHTML = '✅ Data exported as file! Save it safely.';
+                                document.body.appendChild(notification);
+                                setTimeout(() => notification.remove(), 4000);
+                              }
                             }
                           } catch (error) {
-                            alert('Failed to clear data');
+                            const notification = document.createElement('div');
+                            notification.className = 'sync-notification error';
+                            notification.innerHTML = `❌ Export failed: ${error.message}`;
+                            document.body.appendChild(notification);
+                            setTimeout(() => notification.remove(), 5000);
                           }
-                        }
-                      }}>
-                        <TrashIcon width={18} />
-                        <div className="item-content">
-                          <span className="item-title">Clear All Data</span>
-                          <small className="item-desc">Remove all budgets & expenses</small>
-                        </div>
-                      </button>
-                      
-                      <div className="dropdown-divider"></div>
-                      
-                      <Form method="post" action="logout" className="dropdown-form">
-                        <button type="submit" className="dropdown-item logout">
-                          <ArrowRightOnRectangleIcon width={18} />
-                          <span>Logout</span>
+                        }}>
+                          <CloudArrowUpIcon width={18} />
+                          <div className="item-content">
+                            <span className="item-title">Backup Data</span>
+                            <small className="item-desc">Google Drive or file export</small>
+                          </div>
                         </button>
-                      </Form>
-                      
-                      <Form
-                        method="post"
-                        action="delete-account"
-                        onSubmit={(event) => {
-                          if (!window.confirm("Delete account and all data? This cannot be undone!")) {
-                            event.preventDefault()
+                        
+                        <button className="dropdown-item sync-item" onClick={async () => {
+                          setIsUserDropdownOpen(false);
+                          try {
+                            // Try Google Drive first, fallback to file import
+                            try {
+                              const success = await syncFromGoogleDrive();
+                              if (success) {
+                                const notification = document.createElement('div');
+                                notification.className = 'sync-notification success';
+                                notification.innerHTML = '✅ Data restored from Google Drive! Refreshing...';
+                                document.body.appendChild(notification);
+                                setTimeout(() => {
+                                  notification.remove();
+                                  window.location.reload();
+                                }, 2000);
+                                return;
+                              }
+                            } catch (driveError) {
+                              console.log('Google Drive failed, using file import:', driveError);
+                            }
+                            
+                            // Fallback to file import
+                            const success = await importFromFile();
+                            if (success) {
+                              const notification = document.createElement('div');
+                              notification.className = 'sync-notification success';
+                              notification.innerHTML = '✅ Data imported successfully! Refreshing...';
+                              document.body.appendChild(notification);
+                              setTimeout(() => {
+                                notification.remove();
+                                window.location.reload();
+                              }, 2000);
+                            }
+                          } catch (error) {
+                            const notification = document.createElement('div');
+                            notification.className = 'sync-notification error';
+                            notification.innerHTML = `❌ Import failed: ${error.message}`;
+                            document.body.appendChild(notification);
+                            setTimeout(() => notification.remove(), 5000);
                           }
-                        }}
-                        className="dropdown-form"
-                      >
-                        <button type="submit" className="dropdown-item danger">
+                        }}>
+                          <CloudArrowDownIcon width={18} />
+                          <div className="item-content">
+                            <span className="item-title">Restore Data</span>
+                            <small className="item-desc">Google Drive or file import</small>
+                          </div>
+                        </button>
+                        
+                        <button className="dropdown-item danger" onClick={() => {
+                          setIsUserDropdownOpen(false);
+                          if (window.confirm('Are you sure you want to clear all budgets and expenses? This action cannot be undone.')) {
+                            try {
+                              const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                              if (currentUser) {
+                                localStorage.removeItem(`budgets_${currentUser.id}`);
+                                localStorage.removeItem(`expenses_${currentUser.id}`);
+                                localStorage.removeItem(`recurringExpenses_${currentUser.id}`);
+                                window.location.reload();
+                              }
+                            } catch (error) {
+                              alert('Failed to clear data');
+                            }
+                          }
+                        }}>
                           <TrashIcon width={18} />
-                          <span>Delete Account</span>
+                          <div className="item-content">
+                            <span className="item-title">Clear All Data</span>
+                            <small className="item-desc">Remove all budgets & expenses</small>
+                          </div>
                         </button>
-                      </Form>
+                      </div>
+                      
+                      {/* Support Section */}
+                      <div className="dropdown-section">
+                        <h4 className="section-title">Support</h4>
+                        <button className="dropdown-item contact-item" onClick={() => {
+                          setIsUserDropdownOpen(false);
+                          const subject = 'HomeBudget Support Request';
+                          const body = `Hi HomeBudget Support Team,\n\nI need help with:\n\n[Please describe your issue here]\n\nUser: ${currentUser.fullName}\nEmail: ${currentUser.email}\n\nThank you!`;
+                          window.open(`mailto:help.homebudget@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+                        }}>
+                          <ChatBubbleLeftRightIcon width={18} />
+                          <div className="item-content">
+                            <span className="item-title">Contact Us</span>
+                            <small className="item-desc">Get help and support</small>
+                          </div>
+                        </button>
+                      </div>
+                      
+                      {/* Account Actions Section */}
+                      <div className="dropdown-section">
+                        <h4 className="section-title">Actions</h4>
+                        <Form method="post" action="logout" className="dropdown-form">
+                          <button type="submit" className="dropdown-item logout">
+                            <ArrowRightOnRectangleIcon width={18} />
+                            <div className="item-content">
+                              <span className="item-title">Logout</span>
+                              <small className="item-desc">Sign out of your account</small>
+                            </div>
+                          </button>
+                        </Form>
+                        
+                        <Form
+                          method="post"
+                          action="delete-account"
+                          onSubmit={(event) => {
+                            if (!window.confirm("Delete account and all data? This cannot be undone!")) {
+                              event.preventDefault()
+                            }
+                          }}
+                          className="dropdown-form"
+                        >
+                          <button type="submit" className="dropdown-item danger">
+                            <TrashIcon width={18} />
+                            <div className="item-content">
+                              <span className="item-title">Delete Account</span>
+                              <small className="item-desc">Permanently remove account</small>
+                            </div>
+                          </button>
+                        </Form>
+                      </div>
                     </div>
+                    
+                    {/* Scroll indicator */}
+                    {showScrollIndicator && (
+                      <div className="dropdown-scroll-indicator">
+                        <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                        </svg>
+                      </div>
+                    )}
                   </div>
+                  </>
                 )}
               </div>
               

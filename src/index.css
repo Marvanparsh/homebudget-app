@@ -1,7 +1,6 @@
 /* ⚠️ CSS optimized for the tutorial, not for expanding to a larger site. ⚠️ */
 
 @import url('./auth.css');
-@import url('./social-login.css');
 @import url('./landing.css');
 @import url('./encouragement.css');
 @import url('./achievement-velocity.css');
@@ -9,10 +8,7 @@
 @import url('./drag-drop.css');
 @import url('./dark-mode-fixes.css');
 @import url('./chart-wrapper-fix.css');
-@import url('./responsive-enhancements.css');
-@import url('./responsive-animations.css');
-@import url('./mobile-navigation.css');
-@import url('./responsive-components.css');
+@import url('./enhanced-dropdown.css');
 
 
 *,
@@ -494,11 +490,31 @@ main {
   border: 1px solid hsl(var(--light));
   border-radius: var(--round-lg);
   box-shadow: 0 8px 32px hsl(var(--muted) / 0.2);
-  min-width: 280px;
-  max-height: 80vh;
+  min-width: 320px;
+  max-width: 380px;
+  max-height: 70vh;
   overflow-y: auto;
   z-index: 1000;
   animation: dropdownSlideIn 0.2s ease;
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--accent) / 0.3) transparent;
+}
+
+.user-dropdown::-webkit-scrollbar {
+  width: 4px;
+}
+
+.user-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.user-dropdown::-webkit-scrollbar-thumb {
+  background: hsl(var(--accent) / 0.4);
+  border-radius: 2px;
+}
+
+.user-dropdown::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--accent) / 0.6);
 }
 
 @keyframes dropdownSlideIn {
@@ -517,7 +533,11 @@ main {
   align-items: center;
   gap: var(--space-md);
   padding: var(--space-lg);
-  background: linear-gradient(135deg, hsl(var(--accent) / 0.05), hsl(var(--bkg)));
+  background: hsl(var(--bkg));
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid hsl(var(--light));
 }
 
 .user-info {
@@ -544,23 +564,21 @@ main {
 
 .dropdown-menu {
   padding: var(--space-sm) 0;
-  max-height: 60vh;
-  overflow-y: auto;
 }
 
 .dropdown-item {
   display: flex;
-  align-items: center;
-  gap: var(--space-sm);
+  align-items: flex-start;
+  gap: var(--space-md);
   width: 100%;
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-md) var(--space-lg);
   background: none;
   border: none;
   text-align: left;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   color: hsl(var(--text));
-  font-size: var(--fs-200);
+  font-size: var(--fs-300);
   border-radius: var(--round-sm);
   margin: 0 var(--space-xs);
 }
@@ -568,22 +586,21 @@ main {
 .item-content {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   flex: 1;
 }
 
 .item-title {
-  font-weight: 500;
+  font-weight: 600;
   color: hsl(var(--text));
   line-height: 1.2;
-  font-size: var(--fs-200);
 }
 
 .item-desc {
   color: hsl(var(--muted));
-  font-size: var(--fs-100);
+  font-size: var(--fs-200);
   font-weight: 400;
-  line-height: 1.2;
+  line-height: 1.3;
   display: block;
 }
 
@@ -5796,72 +5813,11 @@ select.error {
     width: 100%;
   }
 }
-/* Sync dropdown item styles */
-.dropdown-item.sync-item {
-  color: hsl(var(--accent));
-}
-
-.dropdown-item.sync-item:hover {
-  background: hsl(var(--accent) / 0.1);
-  color: hsl(var(--accent));
-}
-
-.dropdown-item.sync-item svg {
-  color: hsl(var(--accent));
-}
-/* Enhanced dropdown scrollbar */
-.user-dropdown::-webkit-scrollbar,
-.dropdown-menu::-webkit-scrollbar {
-  width: 6px;
-}
-
-.user-dropdown::-webkit-scrollbar-track,
-.dropdown-menu::-webkit-scrollbar-track {
-  background: hsl(var(--light) / 0.3);
-  border-radius: 3px;
-}
-
-.user-dropdown::-webkit-scrollbar-thumb,
-.dropdown-menu::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted) / 0.5);
-  border-radius: 3px;
-}
-
-.user-dropdown::-webkit-scrollbar-thumb:hover,
-.dropdown-menu::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted));
-}
-
-/* Compact dropdown items */
-.dropdown-item svg {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-}
-
-/* Mobile dropdown adjustments */
-@media (max-width: 768px) {
-  .user-dropdown {
-    position: fixed;
-    top: 50% !important;
-    left: 50% !important;
-    right: auto !important;
-    transform: translate(-50%, -50%) !important;
-    min-width: 90vw;
-    max-width: 400px;
-    max-height: 85vh;
-  }
-  
-  .dropdown-item {
-    padding: var(--space-md);
-    font-size: var(--fs-300);
-  }
-  
-  .item-title {
-    font-size: var(--fs-300);
-  }
-  
-  .item-desc {
-    font-size: var(--fs-200);
-  }
+.last-sync-info {
+  padding: 4px var(--space-md);
+  color: hsl(var(--muted));
+  font-size: var(--fs-100);
+  text-align: center;
+  border-bottom: 1px solid hsl(var(--light) / 0.3);
+  margin-bottom: var(--space-xs);
 }
