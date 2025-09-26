@@ -1,4 +1,6 @@
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const DISABLE_OAUTH = import.meta.env.VITE_DISABLE_OAUTH === 'true';
+const MOCK_AUTH = import.meta.env.VITE_MOCK_AUTH === 'true';
 
 class GoogleAuth {
   constructor() {
@@ -6,7 +8,7 @@ class GoogleAuth {
   }
 
   async initialize() {
-    if (this.isInitialized || !GOOGLE_CLIENT_ID) return;
+    if (this.isInitialized || !GOOGLE_CLIENT_ID || DISABLE_OAUTH) return;
 
     return new Promise((resolve, reject) => {
       if (!window.google) {
@@ -28,6 +30,26 @@ class GoogleAuth {
   }
 
   async signIn() {
+    // Mock authentication for development
+    if (DISABLE_OAUTH || MOCK_AUTH) {
+      const mockUser = {
+        id: 'mock_google_user',
+        name: 'Test User',
+        email: 'test@example.com',
+        picture: 'https://via.placeholder.com/150',
+        provider: 'google'
+      };
+      
+      // Simulate async operation
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Store mock user and trigger auth change
+      localStorage.setItem('currentUser', JSON.stringify(mockUser));
+      window.dispatchEvent(new Event('authChange'));
+      
+      return mockUser;
+    }
+    
     if (!GOOGLE_CLIENT_ID) {
       throw new Error('Please add VITE_GOOGLE_CLIENT_ID to .env file. See QUICK_OAUTH_SETUP.md');
     }
@@ -48,6 +70,12 @@ class GoogleAuth {
   }
 
   async signOut() {
+    // Clear mock auth data
+    if (MOCK_AUTH || DISABLE_OAUTH) {
+      localStorage.removeItem('currentUser');
+      return;
+    }
+    
     if (window.google) {
       window.google.accounts.id.disableAutoSelect();
     }

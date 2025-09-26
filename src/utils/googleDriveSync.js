@@ -4,22 +4,59 @@ import { fetchUserData, setUserData, fetchData } from '../helpers';
 const FOLDER_NAME = 'HomeBudget';
 const DATA_FILE_NAME = 'budget-data.json';
 
-// Initialize Google Drive API
+let accessToken = null;
+
+// Initialize Google Drive API with new GIS
 const initGoogleDrive = () => {
   return new Promise((resolve, reject) => {
-    if (!window.gapi) {
+    if (!window.gapi || !window.google) {
       reject(new Error('Google API not loaded'));
       return;
     }
     
-    window.gapi.load('client:auth2', () => {
+    const apiKey = import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY;
+    const clientId = import.meta.env.VITE_REACT_APP_GOOGLE_CLIENT_ID;
+    
+    if (!apiKey || !clientId) {
+      reject(new Error('Google API credentials not configured'));
+      return;
+    }
+    
+    window.gapi.load('client', () => {
       window.gapi.client.init({
-        apiKey: import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY || process.env.REACT_APP_GOOGLE_API_KEY,
-        clientId: import.meta.env.VITE_REACT_APP_GOOGLE_CLIENT_ID || process.env.REACT_APP_GOOGLE_CLIENT_ID,
-        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
-        scope: 'https://www.googleapis.com/auth/drive.file'
-      }).then(resolve).catch(reject);
+        apiKey: apiKey,
+        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
+      }).then(() => {
+        console.log('Google Drive API initialized successfully');
+        resolve();
+      }).catch((error) => {
+        console.error('Google Drive API initialization failed:', error);
+        reject(error);
+      });
     });
+  });
+};
+
+// Get access token using new GIS
+const getAccessToken = () => {
+  return new Promise((resolve, reject) => {
+    const clientId = import.meta.env.VITE_REACT_APP_GOOGLE_CLIENT_ID;
+    
+    const tokenClient = window.google.accounts.oauth2.initTokenClient({
+      client_id: clientId,
+      scope: 'https://www.googleapis.com/auth/drive.file',
+      callback: (response) => {
+        if (response.error) {
+          reject(response);
+        } else {
+          accessToken = response.access_token;
+          window.gapi.client.setToken({ access_token: accessToken });
+          resolve(accessToken);
+        }
+      }
+    });
+    
+    tokenClient.requestAccessToken();
   });
 };
 
@@ -48,20 +85,15 @@ const getOrCreateFolder = async () => {
 // Upload data to Google Drive
 export const syncToGoogleDrive = async () => {
   try {
-    // Check if Google API is loaded
-    if (!window.gapi) {
+    if (!window.gapi || !window.google) {
       throw new Error('Google API not loaded. Please refresh the page.');
     }
 
+    console.log('Initializing Google Drive...');
     await initGoogleDrive();
     
-    const authInstance = window.gapi.auth2.getAuthInstance();
-    if (!authInstance) {
-      throw new Error('Google Auth not initialized');
-    }
-    
-    if (!authInstance.isSignedIn.get()) {
-      await authInstance.signIn();
+    if (!accessToken) {
+      await getAccessToken();
     }
 
     const folderId = await getOrCreateFolder();
@@ -117,6 +149,10 @@ export const syncToGoogleDrive = async () => {
       throw new Error('Popup blocked. Please allow popups for this site.');
     } else if (error.error === 'access_denied') {
       throw new Error('Access denied. Please grant Google Drive permissions.');
+    } else if (error.details && error.details.includes('Not a valid origin')) {
+      throw new Error('OAuth not configured for this domain. Please contact support.');
+    } else if (error.error === 'idpiframe_initialization_failed') {
+      throw new Error('Google Drive authentication failed. Please try again.');
     } else {
       throw new Error(error.message || 'Sync failed. Please try again.');
     }
@@ -126,19 +162,14 @@ export const syncToGoogleDrive = async () => {
 // Download data from Google Drive
 export const syncFromGoogleDrive = async () => {
   try {
-    if (!window.gapi) {
+    if (!window.gapi || !window.google) {
       throw new Error('Google API not loaded. Please refresh the page.');
     }
 
     await initGoogleDrive();
     
-    const authInstance = window.gapi.auth2.getAuthInstance();
-    if (!authInstance) {
-      throw new Error('Google Auth not initialized');
-    }
-    
-    if (!authInstance.isSignedIn.get()) {
-      await authInstance.signIn();
+    if (!accessToken) {
+      await getAccessToken();
     }
 
     const folderId = await getOrCreateFolder();

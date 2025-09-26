@@ -65,6 +65,11 @@ export const AuthProvider = ({ children }) => {
     }
     
     window.dispatchEvent(new Event('authChange'));
+    
+    // Force page refresh after logout
+    setTimeout(() => {
+      window.location.href = '/welcome';
+    }, 100);
   };
 
   const value = {

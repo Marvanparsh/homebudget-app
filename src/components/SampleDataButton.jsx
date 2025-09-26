@@ -92,6 +92,14 @@ const SampleDataButton = () => {
         <SparklesIcon width={16} />
         Add Sample Data
       </button>
+      <a 
+        href="/sample-bank-statement.csv"
+        download="sample-bank-statement.csv"
+        className="btn btn--outline"
+        title="Download sample bank statement for testing import"
+      >
+        📄 Download Sample CSV
+      </a>
       <button 
         className="btn btn--warning"
         onClick={clearData}

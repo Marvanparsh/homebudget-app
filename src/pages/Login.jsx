@@ -24,13 +24,15 @@ const Login = () => {
   }, [user, navigate]);
 
   return (
-    <div className="layout">
+    <div className="layout auth-layout">
       <main>
-        <div className="intro">
-          <div className="signin-container">
-            <h1>Sign In</h1>
-            <p>Welcome back</p>
-            <Form method="post" className="grid-sm">
+        <div className="intro auth-intro">
+          <div className="auth-card modern-auth-card">
+            <div className="auth-header">
+              <h1>Welcome Back</h1>
+              <p>Sign in to continue your financial journey</p>
+            </div>
+            <Form method="post" className="auth-form">
               <div className="form-group">
                 <label htmlFor="identifier">Email or Username</label>
                 <div className="input-with-icon">
@@ -81,26 +83,17 @@ const Login = () => {
               </button>
             </Form>
             
-            <p className="auth-link-text">
-              Don't have an account? <Link to="/signup" className="auth-link">Sign Up</Link>
-            </p>
-            
             <SocialLogin />
             
             <div className="auth-footer">
               <p className="auth-link-text">
-                New user? Just use Google login to create an account automatically
-              </p>
-            </div>
-            
-            <div className="login-encouragement">
-              <div className="encouragement-icon">🌟</div>
-              <p className="encouragement-text">
-                Welcome back! Ready to continue your financial success story?
+                Don't have an account? <Link to="/signup" className="auth-link">Create one here</Link>
               </p>
             </div>
           </div>
-          <img src={isDark ? darkIllustration : illustration} alt="Person with money" width={500} height={400} style={{objectFit: 'cover'}} />
+          <div className="auth-illustration">
+            <img src={isDark ? darkIllustration : illustration} alt="Person with money" />
+          </div>
         </div>
       </main>
       <img src={wave} alt="Decorative wave pattern" />

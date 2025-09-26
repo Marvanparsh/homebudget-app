@@ -8,7 +8,12 @@ export async function logoutAction() {
   // Remove current user session
   localStorage.removeItem('currentUser');
   toast.success("You've been logged out successfully!");
-  
+
+  // Force immediate redirect and refresh
+  setTimeout(() => {
+    window.location.href = '/welcome';
+  }, 500);
+
   return redirect("/welcome");
 }
 

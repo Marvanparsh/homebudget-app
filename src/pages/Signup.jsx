@@ -25,13 +25,15 @@ const Signup = () => {
   }, [user, navigate]);
 
   return (
-    <div className="layout">
+    <div className="layout auth-layout">
       <main>
-        <div className="intro">
-          <div className="signin-container">
-            <h1>Sign Up</h1>
-            <p>Create your account</p>
-            <Form method="post" className="signup-form">
+        <div className="intro auth-intro">
+          <div className="auth-card modern-auth-card signup-card">
+            <div className="auth-header">
+              <h1>Get Started</h1>
+              <p>Create your account and take control of your finances</p>
+            </div>
+            <Form method="post" className="auth-form signup-form">
               {/* Row 1: Full Name */}
               <div className="form-row">
                 <div className="form-group">
@@ -142,20 +144,18 @@ const Signup = () => {
                 {isSubmitting ? 'Creating Account...' : 'Create Account'}
               </button>
             </Form>
-            <p className="auth-link-text">
-              Already have an account? <Link to="/login" className="auth-link">Sign in here</Link>
-            </p>
             
             <SocialLogin compact />
             
-            <div className="signup-encouragement">
-              <div className="encouragement-icon"><RocketLaunchIcon width={32} /></div>
-              <p className="encouragement-text">
-                You're about to start an amazing financial journey!
+            <div className="auth-footer">
+              <p className="auth-link-text">
+                Already have an account? <Link to="/login" className="auth-link">Sign in here</Link>
               </p>
             </div>
           </div>
-          <img src={isDark ? darkIllustration : illustration} alt="Person with money" width={600} height={400} />
+          <div className="auth-illustration">
+            <img src={isDark ? darkIllustration : illustration} alt="Person with money" />
+          </div>
         </div>
       </main>
       <img src={wave} alt="Decorative wave pattern" />

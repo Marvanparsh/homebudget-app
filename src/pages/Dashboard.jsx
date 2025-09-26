@@ -279,7 +279,7 @@ const Dashboard = () => {
                 
                 <RecurringExpenses budgets={budgets} />
                 
-                <DataManager />
+                <DataManager budgets={budgets} />
                 
                 {expenses && expenses.length > 0 && (
                   <div className="grid-md">
