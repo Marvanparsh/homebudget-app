@@ -9,6 +9,10 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
 import SyncIndicator from "./components/SyncIndicator";
+import InstallPrompt from "./components/InstallPrompt";
+
+// Styles
+import "./install-prompt.css";
 
 // Contexts
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -139,6 +143,7 @@ function App() {
             <RouterProvider router={router} />
             <ToastContainer />
             <SyncIndicator />
+            <InstallPrompt />
           </div>
         </ErrorBoundary>
       </ThemeProvider>

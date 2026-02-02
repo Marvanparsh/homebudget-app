@@ -59,16 +59,19 @@ const BudgetItem = ({ budget, showDelete = false, dragHandlers, index, isDraggin
 
   return (
     <div
-      className={`budget ${isOverBudget ? 'over-budget' : ''} ${isNearLimit ? 'near-limit' : ''} ${isDragging ? 'dragging' : ''} ${isDragOver ? 'drag-over' : ''}`}
+      className={`budget ${isOverBudget ? 'over-budget' : ''} ${isNearLimit ? 'near-limit' : ''} ${isDragging ? 'dragging' : ''} ${isDragOver ? 'drag-over' : ''} ${dragHandlers?.isDragEnabled ? 'drag-enabled' : ''}`}
       style={{
         "--accent": color,
       }}
-      draggable
+      draggable={dragHandlers?.isDragEnabled}
       data-drop-index={index}
       onDragStart={(e) => dragHandlers?.handleDragStart(e, budget, index)}
       onDragEnd={dragHandlers?.handleDragEnd}
       onDragOver={(e) => dragHandlers?.handleDragOver(e, index)}
       onDrop={(e) => dragHandlers?.handleDrop(e, index)}
+      onMouseDown={(e) => dragHandlers?.handleMouseDown(e, budget, index)}
+      onMouseUp={dragHandlers?.handleMouseUp}
+      onMouseLeave={dragHandlers?.handleMouseLeave}
       onTouchStart={(e) => dragHandlers?.handleTouchStart(e, budget, index)}
       onTouchMove={dragHandlers?.handleTouchMove}
       onTouchEnd={dragHandlers?.handleTouchEnd}

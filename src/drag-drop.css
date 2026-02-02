@@ -5,8 +5,14 @@
 
 .budget {
   transition: all 0.2s ease;
-  cursor: grab;
+  cursor: default;
   user-select: none;
+}
+
+.budget.drag-enabled {
+  cursor: grabbing;
+  transform: scale(1.02);
+  box-shadow: 0 4px 15px hsl(var(--accent) / 0.3);
 }
 
 .budget:active {

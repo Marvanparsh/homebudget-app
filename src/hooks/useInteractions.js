@@ -89,31 +89,66 @@ export const useNotification = () => {
   return { notifications, addNotification, removeNotification };
 };
 
-// Drag and drop hook
+// Drag and drop hook with 5-second hold requirement
 export const useDragAndDrop = (items, onReorder) => {
   const [draggedItem, setDraggedItem] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
+  const [isDragEnabled, setIsDragEnabled] = useState(false);
+  const [holdTimer, setHoldTimer] = useState(null);
+  const [holdStartTime, setHoldStartTime] = useState(null);
+
+  const startHoldTimer = useCallback((e, item, index) => {
+    const timer = setTimeout(() => {
+      setIsDragEnabled(true);
+      e.target.style.cursor = 'grabbing';
+      e.target.style.transform = 'scale(1.02)';
+    }, 3000);
+    
+    setHoldTimer(timer);
+    setHoldStartTime(Date.now());
+    e.target.style.cursor = 'grab';
+  }, []);
+
+  const clearHoldTimer = useCallback((e) => {
+    if (holdTimer) {
+      clearTimeout(holdTimer);
+      setHoldTimer(null);
+    }
+    setHoldStartTime(null);
+    setIsDragEnabled(false);
+    if (e?.target) {
+      e.target.style.cursor = 'default';
+      e.target.style.transform = 'scale(1)';
+    }
+  }, [holdTimer]);
 
   const handleDragStart = useCallback((e, item, index) => {
+    if (!isDragEnabled) {
+      e.preventDefault();
+      return;
+    }
     setDraggedItem({ item, index });
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/html', e.target.outerHTML);
     e.target.style.opacity = '0.5';
-  }, []);
+  }, [isDragEnabled]);
 
   const handleDragEnd = useCallback((e) => {
     e.target.style.opacity = '1';
     setDraggedItem(null);
     setDragOverIndex(null);
-  }, []);
+    clearHoldTimer(e);
+  }, [clearHoldTimer]);
 
   const handleDragOver = useCallback((e, index) => {
+    if (!isDragEnabled) return;
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     setDragOverIndex(index);
-  }, []);
+  }, [isDragEnabled]);
 
   const handleDrop = useCallback((e, dropIndex) => {
+    if (!isDragEnabled) return;
     e.preventDefault();
     if (!draggedItem || draggedItem.index === dropIndex) return;
 
@@ -124,14 +159,29 @@ export const useDragAndDrop = (items, onReorder) => {
     onReorder(newItems);
     setDraggedItem(null);
     setDragOverIndex(null);
-  }, [draggedItem, items, onReorder]);
+  }, [draggedItem, items, onReorder, isDragEnabled]);
+
+  const handleMouseDown = useCallback((e, item, index) => {
+    startHoldTimer(e, item, index);
+  }, [startHoldTimer]);
+
+  const handleMouseUp = useCallback((e) => {
+    const holdDuration = holdStartTime ? Date.now() - holdStartTime : 0;
+    if (holdDuration < 3000) {
+      clearHoldTimer(e);
+    }
+  }, [holdStartTime, clearHoldTimer]);
+
+  const handleMouseLeave = useCallback((e) => {
+    clearHoldTimer(e);
+  }, [clearHoldTimer]);
 
   const handleTouchStart = useCallback((e, item, index) => {
-    setDraggedItem({ item, index });
-    e.target.style.opacity = '0.7';
-  }, []);
+    startHoldTimer(e, item, index);
+  }, [startHoldTimer]);
 
   const handleTouchMove = useCallback((e) => {
+    if (!isDragEnabled) return;
     e.preventDefault();
     const touch = e.touches[0];
     const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -140,27 +190,36 @@ export const useDragAndDrop = (items, onReorder) => {
       const index = parseInt(dropTarget.dataset.dropIndex);
       setDragOverIndex(index);
     }
-  }, []);
+  }, [isDragEnabled]);
 
   const handleTouchEnd = useCallback((e) => {
-    e.target.style.opacity = '1';
-    if (dragOverIndex !== null && draggedItem && draggedItem.index !== dragOverIndex) {
-      const newItems = [...items];
-      const [removed] = newItems.splice(draggedItem.index, 1);
-      newItems.splice(dragOverIndex, 0, removed);
-      onReorder(newItems);
+    const holdDuration = holdStartTime ? Date.now() - holdStartTime : 0;
+    
+    if (holdDuration >= 3000 && isDragEnabled) {
+      if (dragOverIndex !== null && draggedItem && draggedItem.index !== dragOverIndex) {
+        const newItems = [...items];
+        const [removed] = newItems.splice(draggedItem.index, 1);
+        newItems.splice(dragOverIndex, 0, removed);
+        onReorder(newItems);
+      }
+      setDraggedItem(null);
+      setDragOverIndex(null);
     }
-    setDraggedItem(null);
-    setDragOverIndex(null);
-  }, [draggedItem, dragOverIndex, items, onReorder]);
+    
+    clearHoldTimer(e);
+  }, [draggedItem, dragOverIndex, items, onReorder, isDragEnabled, holdStartTime, clearHoldTimer]);
 
   return {
     draggedItem,
     dragOverIndex,
+    isDragEnabled,
     handleDragStart,
     handleDragEnd,
     handleDragOver,
     handleDrop,
+    handleMouseDown,
+    handleMouseUp,
+    handleMouseLeave,
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd
