@@ -61,7 +61,9 @@ export const AuthProvider = ({ children }) => {
     try {
       await signOutFromProviders();
     } catch (error) {
-      console.error('Error signing out from providers:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error signing out from providers:', error);
+      }
     }
     
     window.dispatchEvent(new Event('authChange'));

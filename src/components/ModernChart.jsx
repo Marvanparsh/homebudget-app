@@ -41,27 +41,10 @@ const ModernChart = ({ data, color, type, yAxisMax }) => {
   const chartData = useMemo(() => {
     if (!data?.length) return null;
     
-    const chartPoints = data.map(item => {
-      const date = new Date();
-      if (type === 'monthly') {
-        const monthIndex = data.indexOf(item);
-        date.setMonth(date.getMonth() - (data.length - 1 - monthIndex));
-        date.setDate(1);
-      } else {
-        const weekIndex = data.indexOf(item);
-        const daysBack = (data.length - 1 - weekIndex) * 7;
-        date.setDate(date.getDate() - daysBack - date.getDay());
-      }
-      
-      return {
-        x: date.toISOString().split('T')[0],
-        y: item.value
-      };
-    });
-    
     return {
+      labels: data.map(item => item.label),
       datasets: [{
-        data: chartPoints,
+        data: data.map(item => item.value),
         borderColor: color,
         backgroundColor: color.replace('hsl(', 'hsla(').replace(')', ', 0.1)'),
         borderWidth: 3,
@@ -74,7 +57,7 @@ const ModernChart = ({ data, color, type, yAxisMax }) => {
         tension: 0.4,
       }]
     };
-  }, [data, color, type]);
+  }, [data, color]);
 
   const options = useMemo(() => ({
     responsive: true,
@@ -88,9 +71,9 @@ const ModernChart = ({ data, color, type, yAxisMax }) => {
         display: false
       },
       tooltip: {
-        backgroundColor: 'hsl(var(--text))',
-        titleColor: 'hsl(var(--bkg))',
-        bodyColor: 'hsl(var(--bkg))',
+        backgroundColor: 'rgba(128, 128, 128, 0.95)',
+        titleColor: '#ffffff',
+        bodyColor: '#ffffff',
         borderColor: color,
         borderWidth: 1,
         callbacks: {
@@ -100,14 +83,7 @@ const ModernChart = ({ data, color, type, yAxisMax }) => {
     },
     scales: {
       x: {
-        type: 'time',
-        time: {
-          unit: type === 'monthly' ? 'month' : 'week',
-          displayFormats: {
-            month: 'MMM yy',
-            week: 'MMM dd'
-          }
-        },
+        type: 'category',
         grid: {
           display: false
         },

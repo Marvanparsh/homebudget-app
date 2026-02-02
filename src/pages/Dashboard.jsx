@@ -21,7 +21,7 @@ import DataManager from "../components/DataManager";
 import SearchFilter from "../components/SearchFilter";
 import RecurringExpenses from "../components/RecurringExpenses";
 import BudgetTemplates from "../components/BudgetTemplates";
-import FloatingActionButton from "../components/FloatingActionButton";
+
 import NotificationSystem from "../components/NotificationSystem";
 
 import SpendingHeatmap from "../components/SpendingHeatmap";
@@ -31,12 +31,18 @@ import ExpenseComparison from "../components/ExpenseComparison";
 import SampleDataButton from "../components/SampleDataButton";
 import EnhancedSampleDataButton from "../components/EnhancedSampleDataButton";
 import GoalCelebration from "../components/GoalCelebration";
-import MobileOptimizations from "../components/MobileOptimizations";
 
 import ImprovedOnboarding from "../components/ImprovedOnboarding";
 import SmartExpenseSuggestions from "../components/SmartExpenseSuggestions";
 import FinalAchievements from "../components/FinalAchievements";
+import "../monthly-salary-budget.css";
+import "../monthly-salary-demo.css";
+import "../budget-filter.css";
+import "../expense-edit.css";
 import SimpleAchievementBar from "../components/SimpleAchievementBar";
+import MonthlySalaryBudget from "../components/MonthlySalaryBudget";
+import MonthlySalaryDemo from "../components/MonthlySalaryDemo";
+import BudgetFilter from "../components/BudgetFilter";
 
 
 
@@ -45,6 +51,7 @@ import {
   createBudget,
   createExpense,
   createRecurringExpense,
+  createMonthlySalaryBudget,
   updateBudget,
   deleteItem,
   fetchData,
@@ -70,6 +77,63 @@ export async function dashboardAction({ request }) {
   const { _action, ...values } = Object.fromEntries(data);
 
   // This action is no longer needed as user creation is handled by signup page
+
+  if (_action === "createMonthlySalaryBudget") {
+    try {
+      const allocations = {};
+      let customCategories = [];
+      
+      // Extract allocations from form data
+      Object.entries(values).forEach(([key, value]) => {
+        if (key.startsWith('allocation_')) {
+          const categoryId = key.replace('allocation_', '');
+          allocations[categoryId] = value;
+        }
+      });
+      
+      // Parse custom categories if provided
+      if (values.customCategories) {
+        try {
+          customCategories = JSON.parse(values.customCategories);
+        } catch (e) {
+          console.warn('Failed to parse custom categories:', e);
+        }
+      }
+      
+      createMonthlySalaryBudget({
+        monthYear: values.monthYear,
+        totalSalary: values.totalSalary,
+        allocations: allocations,
+        createSavings: values.createSavings === 'true',
+        customCategories: customCategories
+      });
+      
+      const monthName = new Date(values.monthYear + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      const totalAllocated = Object.values(allocations).reduce((sum, val) => sum + (+val || 0), 0);
+      const remaining = (+values.totalSalary) - totalAllocated;
+      
+      let message = `Monthly salary budget for ${monthName} created successfully!`;
+      if (remaining > 0 && values.createSavings === 'true') {
+        message += ` Savings budget of ₹${remaining.toLocaleString()} also created.`;
+      }
+      
+      return toast.success(message);
+    } catch (e) {
+      return toast.error(e.message);
+    }
+  }
+
+  if (_action === "deleteBudget") {
+    try {
+      deleteItem({
+        key: "budgets",
+        id: values.budgetId,
+      });
+      return toast.success("Budget deleted successfully!");
+    } catch (e) {
+      return toast.error(e.message);
+    }
+  }
 
   if (_action === "createBudget") {
     try {
@@ -180,10 +244,7 @@ const Dashboard = () => {
     setOrderedBudgets(budgets || []);
   }, [budgets]);
 
-  
-  // Show floating action button only when user has budgets
-  const showFAB = budgets && budgets.length > 0;
-  
+
 
 
   const handleOnboardingComplete = () => {
@@ -220,11 +281,9 @@ const Dashboard = () => {
 
 
   return (
-    <MobileOptimizations>
+    <>
         <NotificationSystem budgets={budgets} expenses={expenses} />
         <GoalCelebration budgets={budgets} />
-      
-      {showFAB && <FloatingActionButton budgets={budgets} />}
       
       {currentUser ? (
         <div className="dashboard">
@@ -246,56 +305,77 @@ const Dashboard = () => {
           <div className="grid-sm">
             {budgets && budgets.length > 0 ? (
               <div className="grid-lg">
-                <SmartExpenseSuggestions onSuggestionSelect={handleSmartSuggestion} />
+                <div className="dashboard-suggestions">
+                  <SmartExpenseSuggestions onSuggestionSelect={handleSmartSuggestion} />
+                </div>
                 
-                <div className="flex-lg">
-                  <AddBudgetForm />
-                  <AddExpenseForm budgets={budgets} />
+                <div className="dashboard-forms">
+                  <div className="flex-lg">
+                    <AddBudgetForm />
+                    <AddExpenseForm budgets={budgets} />
+                  </div>
                 </div>
-                <h2>Existing Budgets</h2>
-                <div className="budgets draggable-budgets">
-                  {orderedBudgets.map((budget, index) => (
-                    <BudgetItem 
-                      key={budget.id} 
-                      budget={budget} 
-                      index={index}
-                      dragHandlers={dragHandlers}
-                      isDragging={dragHandlers.draggedItem?.item.id === budget.id}
-                      isDragOver={dragHandlers.dragOverIndex === index}
-                    />
-                  ))}
+                
+                <div className="dashboard-salary-tools">
+                  <MonthlySalaryDemo />
+                  <MonthlySalaryBudget />
                 </div>
+                
+                <div className="dashboard-budgets">
+                  <BudgetFilter budgets={orderedBudgets}>
+                    {(filteredBudgets) => (
+                      <div className="budgets-grid">
+                        {filteredBudgets.map((budget, index) => (
+                          <BudgetItem 
+                            key={budget.id} 
+                            budget={budget} 
+                            index={index}
+                            dragHandlers={dragHandlers}
+                            isDragging={dragHandlers.draggedItem?.item.id === budget.id}
+                            isDragOver={dragHandlers.dragOverIndex === index}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </BudgetFilter>
+                </div>
+                
                 <div className="dashboard-grid">
-                  <ModernAnalytics expenses={expenses || []} budgets={budgets || []} />
-                  
-                  <BudgetHealthScore expenses={expenses || []} budgets={budgets || []} />
-                  
-                  <ExpenseInsights expenses={expenses || []} budgets={budgets || []} />
-                  
-                  <ExpenseComparison expenses={expenses || []} />
-                  
-                  <SpendingHeatmap expenses={expenses || []} />
+                                  <ModernAnalytics expenses={expenses || []} budgets={budgets || []} />
+                                  
+                                  <BudgetHealthScore expenses={expenses || []} budgets={budgets || []} />
+                                  
+                                  <ExpenseInsights expenses={expenses || []} budgets={budgets || []} />
+                                  
+                                  <ExpenseComparison expenses={expenses || []} />
+                                  
+                                  <SpendingHeatmap expenses={expenses || []} />
+                 </div>
+                
+                <div className="recurring-expenses">
+                  <RecurringExpenses budgets={budgets} />
                 </div>
+                <div className="recurring-expenses">
+                  <DataManager budgets={budgets} />
+                </div>
+                  
                 
-                <RecurringExpenses budgets={budgets} />
-                
-                <DataManager budgets={budgets} />
                 
                 {expenses && expenses.length > 0 && (
-                  <div className="grid-md">
-                    <h2>Recent Expenses</h2>
-                    <Table
-                      expenses={expenses
-                        .sort((a, b) => b.createdAt - a.createdAt)
-                        .slice(0, 8)}
-                    />
-                    {expenses.length > 8 && (
-                      <Link to="/dashboard/expenses" className="btn btn--dark">
-                        View all expenses
-                      </Link>
-                    )}
-                  </div>
-                )}
+                                  <div className="grid-md">
+                                    <h2>Recent Expenses</h2>
+                                    <Table
+                                      expenses={expenses
+                                        .sort((a, b) => b.createdAt - a.createdAt)
+                                        .slice(0, 8)}
+                                    />
+                                    {expenses.length > 8 && (
+                                      <Link to="/dashboard/expenses" className="btn btn--dark">
+                                        View all expenses
+                                      </Link>
+                                    )}
+                                  </div>
+                                )}
                 
                 <div className="encouragement-section">
                   <div className="encouragement-card">
@@ -305,31 +385,48 @@ const Dashboard = () => {
                   </div>
                 </div>
                 
-                <SimpleAchievementBar expenses={expenses || []} budgets={budgets || []} />
+                <div className="dashboard-achievements">
+                  <SimpleAchievementBar expenses={expenses || []} budgets={budgets || []} />
+                </div>
               </div>
             ) : (
-              <div className="grid-sm">
-                <div className="first-budget-encouragement">
-                  <div className="encouragement-icon"><SparklesIcon width={48} /></div>
-                  <h2>Start Your Financial Journey!</h2>
-                  <p>Personal budgeting is the secret to financial freedom.</p>
-                  <p>Create your first budget and take control of your money today!</p>
-                </div>
-                <BudgetTemplates />
-                <AddBudgetForm />
-                <DataManager showImportOnly={true} />
-                
-                <div className="motivation-tips">
-                  <h3><LightBulbIcon width={20} className="inline" /> Quick Tips for Success:</h3>
-                  <ul>
-                    <li><FlagIcon width={16} className="inline" /> Start with one category you spend most on</li>
-                    <li><ChartBarIcon width={16} className="inline" /> Track every expense, no matter how small</li>
-                    <li><TrophyIcon width={16} className="inline" /> Celebrate small wins along the way</li>
-                    <li><BoltIcon width={16} className="inline" /> Stay consistent - you've got this!</li>
-                  </ul>
+              <div className="dashboard-empty">
+                <div className="empty-state">
+                  <div className="empty-icon">
+                    <SparklesIcon width={64} />
+                  </div>
+                  <div className="empty-content">
+                    <h2>Start Your Financial Journey!</h2>
+                    <p>Personal budgeting is the secret to financial freedom.</p>
+                    <p>Create your first budget and take control of your money today!</p>
+                  </div>
                 </div>
                 
-                <SimpleAchievementBar expenses={expenses || []} budgets={budgets || []} />
+                <div className="empty-tools">
+                  <BudgetTemplates />
+                  <div className="empty-forms">
+                    <AddBudgetForm />
+                  </div>
+                  <MonthlySalaryDemo />
+                  <MonthlySalaryBudget />
+                  <DataManager showImportOnly={true} />
+                </div>
+                
+                <div className="empty-tips">
+                  <div className="tips-card">
+                    <h3><LightBulbIcon width={20} className="inline" /> Quick Tips for Success:</h3>
+                    <ul className="tips-list">
+                      <li><FlagIcon width={16} className="inline" /> Start with one category you spend most on</li>
+                      <li><ChartBarIcon width={16} className="inline" /> Track every expense, no matter how small</li>
+                      <li><TrophyIcon width={16} className="inline" /> Celebrate small wins along the way</li>
+                      <li><BoltIcon width={16} className="inline" /> Stay consistent - you've got this!</li>
+                    </ul>
+                  </div>
+                </div>
+                
+                <div className="empty-achievements">
+                  <SimpleAchievementBar expenses={expenses || []} budgets={budgets || []} />
+                </div>
               </div>
             )}
           </div>
@@ -340,7 +437,7 @@ const Dashboard = () => {
           <p>You need to be logged in to view your dashboard.</p>
         </div>
       )}
-    </MobileOptimizations>
+    </>
   );
 };
 export default Dashboard;

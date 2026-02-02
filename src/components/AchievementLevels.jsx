@@ -28,13 +28,14 @@ const AchievementLevels = ({ expenses = [], budgets = [] }) => {
 
   // Define achievement levels
   const achievementLevels = useMemo(() => {
-    const totalExpenses = expenses.length;
-    const totalBudgets = budgets.length;
-    const totalSpent = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-    const daysActive = expenses.length > 0 ? 
-      Math.ceil((Date.now() - Math.min(...expenses.map(e => e.createdAt))) / (1000 * 60 * 60 * 24)) : 0;
+    try {
+      const totalExpenses = expenses.length;
+      const totalBudgets = budgets.length;
+      const totalSpent = expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
+      const daysActive = expenses.length > 0 ? 
+        Math.ceil((Date.now() - Math.min(...expenses.map(e => e.createdAt || Date.now()))) / (1000 * 60 * 60 * 24)) : 0;
 
-    return [
+      return [
       // Beginner Levels
       {
         id: 'first-budget',
@@ -208,6 +209,10 @@ const AchievementLevels = ({ expenses = [], budgets = [] }) => {
         color: '#7C2D12'
       }
     ];
+    } catch (error) {
+      console.error('Error calculating achievements:', error);
+      return [];
+    }
   }, [expenses, budgets]);
 
   const categories = [

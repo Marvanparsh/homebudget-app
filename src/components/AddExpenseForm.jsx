@@ -10,6 +10,9 @@ import { PlusCircleIcon } from "@heroicons/react/24/solid"
 // components
 import SmartInput from "./SmartInput"
 
+// styles
+import "../quick-templates.css"
+
 const AddExpenseForm = ({ budgets }) => {
   const fetcher = useFetcher()
   const isSubmitting = fetcher.state === "submitting";
@@ -28,8 +31,6 @@ const AddExpenseForm = ({ budgets }) => {
   const useTemplate = (template) => {
     setFormData({ name: template.name, amount: template.amount.toString() });
   };
-  
-
   
   const handleInputChange = (e) => {
     setFormData(prev => ({

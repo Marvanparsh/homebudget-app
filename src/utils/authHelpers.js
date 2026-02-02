@@ -3,7 +3,12 @@ import { sendVerificationEmail } from './emailService';
 
 // Hash password (simple implementation - in production use bcrypt)
 export const hashPassword = (password) => {
-  return btoa(password + 'salt123'); // Simple base64 encoding with salt
+  try {
+    return btoa(password + 'salt123'); // Simple base64 encoding with salt
+  } catch (error) {
+    console.error('Password hashing failed:', error);
+    return btoa(String(password).replace(/[^\x00-\x7F]/g, '') + 'salt123');
+  }
 };
 
 // Validate email format

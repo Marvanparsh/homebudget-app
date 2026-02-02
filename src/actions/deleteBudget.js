@@ -5,29 +5,38 @@ import { redirect } from "react-router-dom";
 import { toast } from "react-toastify";
 
 // helpers
-import { deleteItem, fetchUserData, setUserData } from "../helpers";
+import { fetchUserData, setUserData } from "../helpers";
 
 export function deleteBudget({ params }) {
   try {
-    deleteItem({
-      key: "budgets",
-      id: params.id,
-    });
-
-    const allExpenses = fetchUserData("expenses") || [];
-    const associatedExpenses = allExpenses.filter(expense => expense.budgetId === params.id);
-
-    associatedExpenses.forEach((expense) => {
-      deleteItem({
-        key: "expenses",
-        id: expense.id,
-      });
-    });
-
+    const budgetId = params.id;
+    
+    // Batch read all data once
+    const [budgets, expenses] = [
+      fetchUserData("budgets") || [],
+      fetchUserData("expenses") || []
+    ];
+    
+    // Verify budget exists
+    const budgetExists = budgets.some(budget => budget.id === budgetId);
+    if (!budgetExists) {
+      toast.error("Budget not found");
+      return redirect("/");
+    }
+    
+    // Batch operations: filter out budget and associated expenses in one pass
+    const updatedBudgets = budgets.filter(budget => budget.id !== budgetId);
+    const updatedExpenses = expenses.filter(expense => expense.budgetId !== budgetId);
+    
+    // Batch write operations
+    setUserData("budgets", updatedBudgets);
+    setUserData("expenses", updatedExpenses);
+    
     toast.success("Budget deleted successfully!");
+    return redirect("/");
   } catch (e) {
     console.error('Error deleting budget:', e);
-    throw new Error(`There was a problem deleting your budget: ${e.message}`);
+    toast.error(`Failed to delete budget: ${e.message || 'Unknown error'}`);
+    return redirect("/");
   }
-  return redirect("/");
 }

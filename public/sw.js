@@ -17,6 +17,14 @@ self.addEventListener('install', (event) => {
 
 // Fetch event
 self.addEventListener('fetch', (event) => {
+  // Validate URL to prevent SSRF
+  const url = new URL(event.request.url);
+  const allowedOrigins = [self.location.origin];
+  
+  if (!allowedOrigins.includes(url.origin)) {
+    return;
+  }
+  
   event.respondWith(
     caches.match(event.request)
       .then((response) => {

@@ -13,7 +13,10 @@ export const fetchData = (key) => {
     const data = localStorage.getItem(key);
     return data ? JSON.parse(data) : null;
   } catch (error) {
-    console.error(`Error parsing data for key "${key}":`, error);
+    // Log error for debugging but don't expose sensitive information
+    if (process.env.NODE_ENV === 'development') {
+      console.error(`Error parsing data for key "${key}":`, error);
+    }
     return null;
   }
 };
@@ -28,7 +31,9 @@ export const fetchUserData = (key) => {
     const data = localStorage.getItem(userKey);
     return data ? JSON.parse(data) : null;
   } catch (error) {
-    console.error(`Error parsing user data for key "${encodeURIComponent(key)}":`, error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error(`Error parsing user data for key "${encodeURIComponent(key)}":`, error);
+    }
     return null;
   }
 };
@@ -43,7 +48,9 @@ export const setUserData = (key, data) => {
     localStorage.setItem(userKey, JSON.stringify(data));
     return true;
   } catch (error) {
-    console.error(`Error setting user data for key "${encodeURIComponent(key)}":`, error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error(`Error setting user data for key "${encodeURIComponent(key)}":`, error);
+    }
     return false;
   }
 };
@@ -73,7 +80,9 @@ export const deleteItem = ({ key, id }) => {
     }
     return setUserData(key, null);
   } catch (error) {
-    console.error(`Error deleting item:`, error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error(`Error deleting item:`, error);
+    }
     throw new Error(`Failed to delete item: ${error.message}`);
   }
 };
@@ -175,16 +184,18 @@ export const updateBudget = ({ id, name, amount }) => {
 
 // create expense
 export const createExpense = ({ name, amount, budgetId }) => {
-  // Validation
-  if (!name || name.trim().length === 0) {
+  // Validation with proper type handling
+  const trimmedName = name ? String(name).trim() : "";
+  if (!trimmedName || trimmedName.length === 0) {
     throw new Error("Expense name is required");
   }
   
-  if (!amount || +amount <= 0) {
+  const numericAmount = Number(amount);
+  if (!amount || isNaN(numericAmount) || numericAmount <= 0) {
     throw new Error("Expense amount must be greater than 0");
   }
   
-  if (!budgetId) {
+  if (!budgetId || String(budgetId).trim() === "") {
     throw new Error("Please select a budget for this expense");
   }
   
@@ -197,13 +208,45 @@ export const createExpense = ({ name, amount, budgetId }) => {
   
   const newItem = {
     id: crypto.randomUUID(),
-    name: name.trim(),
+    name: trimmedName,
     createdAt: Date.now(),
-    amount: +amount,
+    amount: numericAmount,
     budgetId: budgetId,
   };
   const existingExpenses = fetchUserData("expenses") ?? [];
   return setUserData("expenses", [...existingExpenses, newItem]);
+};
+
+// update expense
+export const updateExpense = ({ id, name, amount, budgetId, createdAt }) => {
+  const trimmedName = name ? String(name).trim() : "";
+  if (!trimmedName || trimmedName.length === 0) {
+    throw new Error("Expense name is required");
+  }
+  
+  const numericAmount = Number(amount);
+  if (!amount || isNaN(numericAmount) || numericAmount <= 0) {
+    throw new Error("Expense amount must be greater than 0");
+  }
+  
+  if (!budgetId || String(budgetId).trim() === "") {
+    throw new Error("Please select a budget for this expense");
+  }
+  
+  const budgets = fetchUserData("budgets") ?? [];
+  const budget = budgets.find(b => b.id === budgetId);
+  if (!budget) {
+    throw new Error("Selected budget does not exist");
+  }
+  
+  const existingExpenses = fetchUserData("expenses") ?? [];
+  const updatedExpenses = existingExpenses.map(expense => 
+    expense.id === id 
+      ? { ...expense, name: trimmedName, amount: numericAmount, budgetId, createdAt: createdAt !== undefined ? createdAt : expense.createdAt }
+      : expense
+  );
+  
+  return setUserData("expenses", updatedExpenses);
 };
 
 // total spent by budget
@@ -345,6 +388,49 @@ export const searchExpenses = (expenses, searchTerm) => {
   );
 };
 
+// Smart budget filtering functions
+export const filterBudgetsByMonth = (budgets, monthOffset = 0) => {
+  const targetDate = new Date();
+  targetDate.setMonth(targetDate.getMonth() + monthOffset);
+  const targetMonth = targetDate.toISOString().slice(0, 7);
+  
+  return budgets.filter(budget => {
+    if (!budget.monthYear) return monthOffset === 0; // Legacy budgets show in current
+    return budget.monthYear === targetMonth;
+  });
+};
+
+export const filterOverBudgetBudgets = (budgets) => {
+  const expenses = fetchUserData("expenses") ?? [];
+  return budgets.filter(budget => {
+    const spent = calculateSpentByBudget(budget.id);
+    return spent > budget.amount;
+  });
+};
+
+export const filterMostActiveBudgets = (budgets, limit = 5) => {
+  const expenses = fetchUserData("expenses") ?? [];
+  const budgetActivity = budgets.map(budget => {
+    const budgetExpenses = expenses.filter(expense => expense.budgetId === budget.id);
+    return {
+      ...budget,
+      expenseCount: budgetExpenses.length,
+      lastActivity: budgetExpenses.length > 0 
+        ? Math.max(...budgetExpenses.map(e => e.createdAt))
+        : budget.createdAt
+    };
+  });
+  
+  return budgetActivity
+    .sort((a, b) => {
+      if (a.expenseCount !== b.expenseCount) {
+        return b.expenseCount - a.expenseCount;
+      }
+      return b.lastActivity - a.lastActivity;
+    })
+    .slice(0, limit);
+};
+
 export const filterExpenses = (expenses, { budget, date }) => {
   if (!expenses || !Array.isArray(expenses)) return [];
   
@@ -365,6 +451,114 @@ export const filterExpenses = (expenses, { budget, date }) => {
   }
   
   return filtered;
+};
+
+// Create monthly salary budget with category allocations
+export const createMonthlySalaryBudget = ({ monthYear, totalSalary, allocations, createSavings = false, customCategories = [] }) => {
+  // Validation
+  if (!monthYear || !monthYear.trim()) {
+    throw new Error("Month and year are required");
+  }
+  
+  if (!totalSalary || +totalSalary <= 0) {
+    throw new Error("Salary amount must be greater than 0");
+  }
+  
+  if (!allocations || typeof allocations !== 'object') {
+    throw new Error("Category allocations are required");
+  }
+  
+  const totalAllocated = Object.values(allocations).reduce((sum, val) => sum + (+val || 0), 0);
+  const remaining = (+totalSalary) - totalAllocated;
+  
+  if (remaining < 0) {
+    throw new Error(`Over-allocated by ₹${Math.abs(remaining)}. Please reduce allocations.`);
+  }
+  
+  const existingBudgets = fetchUserData("budgets") ?? [];
+  const newBudgets = [];
+  const allCategories = [...BUDGET_CATEGORIES, ...customCategories];
+  
+  // Create individual budgets for each allocated category
+  Object.entries(allocations).forEach(([categoryId, amount]) => {
+    if (+amount > 0) {
+      const category = allCategories.find(cat => cat.id === categoryId);
+      if (!category) {
+        throw new Error(`Invalid category: ${categoryId}`);
+      }
+      
+      const budgetName = `${monthYear} - ${category.name}`;
+      
+      // Check if budget already exists
+      const existingBudget = existingBudgets.find(
+        budget => budget.name.toLowerCase() === budgetName.toLowerCase()
+      );
+      
+      if (existingBudget) {
+        // Update existing budget by adding amount
+        const updatedBudget = {
+          ...existingBudget,
+          amount: existingBudget.amount + (+amount)
+        };
+        newBudgets.push(updatedBudget);
+      } else {
+        // Create new budget
+        const newBudget = {
+          id: crypto.randomUUID(),
+          name: budgetName,
+          createdAt: Date.now(),
+          amount: +amount,
+          category: categoryId,
+          color: generateRandomColor(),
+          monthYear: monthYear,
+          isMonthlySalaryBudget: true
+        };
+        newBudgets.push(newBudget);
+      }
+    }
+  });
+  
+  // Create savings budget if there's remaining amount and user opted for it
+  if (remaining > 0 && createSavings) {
+    const savingsBudgetName = `${monthYear} - Savings`;
+    const existingSavingsBudget = existingBudgets.find(
+      budget => budget.name.toLowerCase() === savingsBudgetName.toLowerCase()
+    );
+    
+    if (existingSavingsBudget) {
+      const updatedSavingsBudget = {
+        ...existingSavingsBudget,
+        amount: existingSavingsBudget.amount + remaining
+      };
+      newBudgets.push(updatedSavingsBudget);
+    } else {
+      const savingsBudget = {
+        id: crypto.randomUUID(),
+        name: savingsBudgetName,
+        createdAt: Date.now(),
+        amount: remaining,
+        category: "savings",
+        color: generateRandomColor(),
+        monthYear: monthYear,
+        isMonthlySalaryBudget: true,
+        isSavingsBudget: true
+      };
+      newBudgets.push(savingsBudget);
+    }
+  }
+  
+  // Merge with existing budgets
+  const updatedBudgets = [...existingBudgets];
+  newBudgets.forEach(newBudget => {
+    const existingIndex = updatedBudgets.findIndex(b => b.id === newBudget.id);
+    if (existingIndex >= 0) {
+      updatedBudgets[existingIndex] = newBudget;
+    } else {
+      updatedBudgets.push(newBudget);
+    }
+  });
+  
+  return setUserData("budgets", updatedBudgets);
 };
 
 // Reorder budgets
@@ -388,7 +582,9 @@ export const reorderBudgets = (newBudgetOrder) => {
     
     return setUserData("budgets", newBudgetOrder);
   } catch (error) {
-    console.error("Error reordering budgets:", error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Error reordering budgets:", error);
+    }
     throw new Error(`Failed to reorder budgets: ${error.message}`);
   }
 };

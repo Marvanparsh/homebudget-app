@@ -6,7 +6,7 @@ import PieChart from './PieChart';
 const ModernAnalytics = ({ expenses, budgets }) => {
   const [viewMode, setViewMode] = useState('overview');
   const [timeRange, setTimeRange] = useState('6months');
-  const [weekRange, setWeekRange] = useState('8weeks');
+  const [weekRange, setWeekRange] = useState('1week');
   
   // Process real expense data for monthly trends
   const monthlyData = useMemo(() => {
@@ -43,8 +43,60 @@ const ModernAnalytics = ({ expenses, budgets }) => {
   const weeklyData = useMemo(() => {
     if (!expenses?.length) return [];
     
-    const weeklyTotals = {};
     const now = new Date();
+    
+    // Handle 1 week (7 days) - show daily data
+    if (weekRange === '1week') {
+      const dailyTotals = {};
+      const dailyExpenseDetails = {};
+      
+      // Process all expenses and group by date
+      expenses.forEach(expense => {
+        const expenseDate = new Date(expense.createdAt);
+        // Normalize to start of day to avoid timezone issues
+        const normalizedDate = new Date(expenseDate.getFullYear(), expenseDate.getMonth(), expenseDate.getDate());
+        const dayKey = normalizedDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+        
+        dailyTotals[dayKey] = (dailyTotals[dayKey] || 0) + expense.amount;
+        if (!dailyExpenseDetails[dayKey]) {
+          dailyExpenseDetails[dayKey] = [];
+        }
+        dailyExpenseDetails[dayKey].push({
+          name: expense.name,
+          amount: expense.amount,
+          time: expenseDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+        });
+      });
+      
+      const days = [];
+      const today = new Date();
+      
+      // Generate last 7 days including today
+      for (let i = 6; i >= 0; i--) {
+        const targetDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
+        const dayKey = targetDate.toISOString().split('T')[0];
+        
+        const dayLabel = targetDate.toLocaleDateString('en-US', { 
+          weekday: 'short',
+          month: 'short', 
+          day: 'numeric' 
+        });
+        
+        days.push({
+          label: dayLabel,
+          value: dailyTotals[dayKey] || 0,
+          date: targetDate,
+          expenses: dailyExpenseDetails[dayKey] || [],
+          expenseCount: (dailyExpenseDetails[dayKey] || []).length
+        });
+      }
+      
+      
+      return days;
+    }
+    
+    // Handle weekly data for other ranges
+    const weeklyTotals = {};
     
     expenses.forEach(expense => {
       const date = new Date(expense.createdAt);
@@ -77,6 +129,7 @@ const ModernAnalytics = ({ expenses, budgets }) => {
         date: date
       });
     }
+    
     
     return weeks;
   }, [expenses, weekRange]);
@@ -195,27 +248,57 @@ const ModernAnalytics = ({ expenses, budgets }) => {
       
       {/* Summary Stats */}
       <div className="stats-overview">
-        <div className="stat-card primary">
-          <div className="stat-icon">💰</div>
-          <div className="stat-content">
-            <h3>Total Spent</h3>
-            <p className="stat-value">{formatCurrency(stats.totalSpent)}</p>
-          </div>
-        </div>
-        <div className="stat-card secondary">
-          <div className="stat-icon">📅</div>
-          <div className="stat-content">
-            <h3>Monthly Avg</h3>
-            <p className="stat-value">{formatCurrency(stats.avgMonthly)}</p>
-          </div>
-        </div>
-        <div className="stat-card tertiary">
-          <div className="stat-icon">📊</div>
-          <div className="stat-content">
-            <h3>Weekly Avg</h3>
-            <p className="stat-value">{formatCurrency(stats.avgWeekly)}</p>
-          </div>
-        </div>
+        {viewMode === 'overview' ? (
+          <>
+            <div className="stat-card primary">
+              <div className="stat-icon">🎯</div>
+              <div className="stat-content">
+                <h3>Total Budget</h3>
+                <p className="stat-value">{formatCurrency(stats.totalBudget)}</p>
+              </div>
+            </div>
+            <div className="stat-card secondary">
+              <div className="stat-icon">💵</div>
+              <div className="stat-content">
+                <h3>Amount Left</h3>
+                <p className={`stat-value ${stats.totalBudget - stats.totalSpent < 0 ? 'negative' : ''}`}>
+                  {formatCurrency(stats.totalBudget - stats.totalSpent)}
+                </p>
+              </div>
+            </div>
+            <div className="stat-card tertiary">
+              <div className="stat-icon">💰</div>
+              <div className="stat-content">
+                <h3>Total Spent</h3>
+                <p className="stat-value">{formatCurrency(stats.totalSpent)}</p>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="stat-card primary">
+              <div className="stat-icon">💰</div>
+              <div className="stat-content">
+                <h3>Total Spent</h3>
+                <p className="stat-value">{formatCurrency(stats.totalSpent)}</p>
+              </div>
+            </div>
+            <div className="stat-card secondary">
+              <div className="stat-icon">📅</div>
+              <div className="stat-content">
+                <h3>Monthly Avg</h3>
+                <p className="stat-value">{formatCurrency(stats.avgMonthly)}</p>
+              </div>
+            </div>
+            <div className="stat-card tertiary">
+              <div className="stat-icon">📊</div>
+              <div className="stat-content">
+                <h3>Weekly Avg</h3>
+                <p className="stat-value">{formatCurrency(stats.avgWeekly)}</p>
+              </div>
+            </div>
+          </>
+        )}
       </div>
       
       {viewMode === 'overview' && (
@@ -268,6 +351,7 @@ const ModernAnalytics = ({ expenses, budgets }) => {
                 <div className="chart-header">
                   <h4>📅 Weekly Pattern</h4>
                   <select value={weekRange} onChange={(e) => setWeekRange(e.target.value)} className="chart-filter">
+                    <option value="1week">1 Week</option>
                     <option value="4weeks">4 Weeks</option>
                     <option value="6weeks">6 Weeks</option>
                     <option value="8weeks">8 Weeks</option>
@@ -275,9 +359,10 @@ const ModernAnalytics = ({ expenses, budgets }) => {
                   </select>
                 </div>
                 <ModernChart 
+                  key={`chart-${weekRange}`}
                   data={weeklyData}
                   color="hsl(280, 70%, 60%)"
-                  type="weekly"
+                  type={weekRange === '1week' ? 'daily' : 'weekly'}
                   yAxisMax={yAxisMax}
                 />
                 {trends.weekly.direction !== 'stable' && (
@@ -328,6 +413,7 @@ const ModernAnalytics = ({ expenses, budgets }) => {
                   <div className="chart-header">
                     <h4>📅 Weekly Pattern</h4>
                     <select value={weekRange} onChange={(e) => setWeekRange(e.target.value)} className="chart-filter">
+                      <option value="1week">1 Week</option>
                       <option value="4weeks">4 Weeks</option>
                       <option value="6weeks">6 Weeks</option>
                       <option value="8weeks">8 Weeks</option>
@@ -335,9 +421,10 @@ const ModernAnalytics = ({ expenses, budgets }) => {
                     </select>
                   </div>
                   <ModernChart 
+                    key={`trends-chart-${weekRange}`}
                     data={weeklyData}
                     color="hsl(280, 70%, 60%)"
-                    type="weekly"
+                    type={weekRange === '1week' ? 'daily' : 'weekly'}
                     yAxisMax={yAxisMax}
                   />
                 </div>

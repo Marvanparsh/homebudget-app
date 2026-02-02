@@ -1,0 +1,245 @@
+/* Monthly Salary Budget Styles */
+.monthly-salary-budget {
+  background: var(--accent-light);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.monthly-salary-budget .h3 {
+  color: var(--accent);
+  margin-bottom: var(--space-xs);
+}
+
+.form-description {
+  color: var(--text-muted);
+  font-size: var(--fs-300);
+  margin-bottom: var(--space-md);
+}
+
+.salary-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.allocation-section {
+  border-top: 1px solid var(--accent);
+  padding-top: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.allocation-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.allocation-header h3 {
+  margin: 0;
+  color: var(--accent);
+}
+
+.allocation-summary {
+  display: flex;
+  gap: var(--space-md);
+  font-size: var(--fs-300);
+  font-weight: 600;
+}
+
+.allocation-summary .total {
+  color: var(--text);
+}
+
+.allocation-summary .allocated {
+  color: var(--blue);
+}
+
+.allocation-summary .remaining {
+  font-weight: 700;
+}
+
+.allocation-summary .remaining.exact {
+  color: var(--green);
+}
+
+.allocation-summary .remaining.under {
+  color: var(--orange);
+}
+
+.allocation-summary .remaining.over {
+  color: var(--red);
+}
+
+.category-allocations {
+  display: grid;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.allocation-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--grey-light);
+}
+
+.allocation-item label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-weight: 500;
+  margin: 0;
+}
+
+.category-icon {
+  font-size: 1.2em;
+}
+
+.category-name {
+  color: var(--text);
+}
+
+.allocation-item input {
+  width: 120px;
+  text-align: right;
+}
+
+.allocation-error {
+  background: var(--red-light);
+  color: var(--red);
+  padding: var(--space-sm);
+  border-radius: var(--radius);
+  border: 1px solid var(--red);
+  display: block;
+  margin-top: var(--space-sm);
+}
+
+.allocation-actions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.add-category-form {
+  background: var(--grey-light);
+  padding: var(--space-md);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-md);
+}
+
+.add-category-inputs {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.add-category-inputs input {
+  flex: 1;
+}
+
+.remove-category {
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  margin-left: var(--space-xs);
+}
+
+.savings-option {
+  background: var(--green-light);
+  border: 1px solid var(--green);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.savings-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-weight: 500;
+  color: var(--green);
+  cursor: pointer;
+}
+
+.savings-checkbox input {
+  margin: 0;
+}
+.allocation-actions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.add-category-form {
+  background: var(--grey-light);
+  padding: var(--space-md);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-md);
+}
+
+.add-category-inputs {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.add-category-inputs input {
+  flex: 1;
+}
+
+.remove-category {
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  margin-left: var(--space-xs);
+}
+
+.savings-option {
+  background: var(--green-light);
+  border: 1px solid var(--green);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.savings-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-weight: 500;
+  color: var(--green);
+  cursor: pointer;
+}
+
+.savings-checkbox input {
+  margin: 0;
+}
+
+/* Mobile Responsive Updates */
+@media (max-width: 768px) {
+  .add-category-inputs {
+    flex-direction: column;
+  }
+  
+  .allocation-actions {
+    flex-direction: column;
+  }
+}

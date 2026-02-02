@@ -1,0 +1,24 @@
+/* Budget Delete Button Styles */
+.budget-delete-btn {
+  background: hsl(var(--warning));
+  color: hsl(var(--bkg));
+  border: none;
+  border-radius: var(--round-sm);
+  padding: var(--space-xs);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.budget-delete-btn:hover {
+  background: hsl(var(--warning) / 0.8);
+  transform: scale(1.05);
+}
+
+.budget-actions {
+  display: flex;
+  gap: var(--space-xs);
+  margin-left: auto;
+}

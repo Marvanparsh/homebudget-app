@@ -27,7 +27,11 @@ export async function budgetLoader({ params }) {
   const allExpenses = fetchUserData("expenses") || [];
   const expenses = allExpenses.filter(e => e.budgetId === params.id);
 
-  return { budget: budget || null, expenses };
+  if (!budget) {
+    throw new Error("The budget you’re trying to find doesn’t exist");
+  }
+
+  return { budget, expenses };
 }
 
 // action
@@ -73,6 +77,7 @@ export async function budgetAction({ request }) {
         localStorage.setItem(userKey, JSON.stringify(remainingBudgets));
       }
       
+      // Don't redirect immediately, let the component detect the deletion
       return toast.success("Budget and associated expenses deleted successfully!");
     } catch (e) {
       return toast.error(e.message);
@@ -96,88 +101,56 @@ const BudgetPage = () => {
   const { budget, expenses } = useLoaderData();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const [countdown, setCountdown] = useState(5);
+  const [isDeleted, setIsDeleted] = useState(false);
+  const [countdown, setCountdown] = useState(3);
   const itemsPerPage = 10;
   
-  // Handle case where budget doesn't exist (deleted)
-  React.useEffect(() => {
-    if (!budget) {
-      const countdownInterval = setInterval(() => {
-        setCountdown(prev => {
-          if (prev <= 1) {
-            clearInterval(countdownInterval);
-            navigate('/dashboard');
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      
-      return () => clearInterval(countdownInterval);
-    }
-  }, [budget, navigate]);
+  const totalPages = Math.ceil(expenses.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedExpenses = expenses.slice(startIndex, startIndex + itemsPerPage);
 
-  if (!budget) {
+  // Check if budget was deleted (from localStorage)
+  React.useEffect(() => {
+    const checkBudgetExists = () => {
+      const allBudgets = fetchUserData("budgets") || [];
+      const budgetExists = allBudgets.find(b => b.id === budget.id);
+      
+      if (!budgetExists) {
+        setIsDeleted(true);
+        
+        const countdownInterval = setInterval(() => {
+          setCountdown(prev => {
+            if (prev <= 1) {
+              clearInterval(countdownInterval);
+              navigate('/dashboard');
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+        
+        return () => clearInterval(countdownInterval);
+      }
+    };
+    
+    // Check immediately and then every 500ms
+    checkBudgetExists();
+    const interval = setInterval(checkBudgetExists, 500);
+    
+    return () => clearInterval(interval);
+  }, [budget.id, navigate]);
+
+  if (isDeleted) {
     return (
-      <div className="grid-lg" style={{ 
-        textAlign: 'center', 
-        padding: 'var(--space-xl)', 
-        minHeight: '60vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <div className="deletion-success" style={{
-          background: 'linear-gradient(135deg, hsl(120, 70%, 95%), hsl(120, 70%, 98%))',
-          border: '2px solid hsl(120, 70%, 50%)',
-          borderRadius: 'var(--round-lg)',
-          padding: 'var(--space-xl)',
-          maxWidth: '500px',
-          boxShadow: '0 8px 32px hsl(120, 70%, 50% / 0.2)',
-          animation: 'fadeIn 0.5s ease'
-        }}>
-          <div style={{ fontSize: '4rem', marginBottom: 'var(--space-md)' }}>✅</div>
-          <h1 className="h2" style={{ color: 'hsl(120, 70%, 30%)', marginBottom: 'var(--space-md)' }}>
-            Budget Deleted Successfully
-          </h1>
-          <p style={{ fontSize: 'var(--fs-400)', marginBottom: 'var(--space-sm)', color: 'hsl(120, 70%, 25%)' }}>
-            This budget no longer exists and has been permanently removed.
-          </p>
-          <div style={{
-            background: 'hsl(120, 70%, 90%)',
-            padding: 'var(--space-md)',
-            borderRadius: 'var(--round-md)',
-            margin: 'var(--space-md) 0',
-            border: '1px solid hsl(120, 70%, 70%)'
-          }}>
-            <p style={{ 
-              fontSize: 'var(--fs-500)', 
-              fontWeight: 'bold', 
-              color: 'hsl(120, 70%, 20%)',
-              margin: 0
-            }}>
-              Redirecting in <span style={{
-                fontSize: '2rem',
-                color: 'hsl(120, 70%, 40%)',
-                textShadow: '0 2px 4px hsl(120, 70%, 80%)'
-              }}>{countdown}</span> seconds...
-            </p>
-          </div>
+      <div className="grid-lg" style={{ textAlign: 'center', padding: 'var(--space-xl)' }}>
+        <div className="deletion-success">
+          <h1 className="h2">✅ Budget Deleted Successfully</h1>
+          <p>This budget doesn't exist anymore - it has been permanently removed.</p>
+          <p>Redirecting to dashboard in <strong>{countdown}</strong> seconds...</p>
           <button 
             className="btn btn--dark" 
             onClick={() => navigate('/dashboard')}
-            style={{ 
-              marginTop: 'var(--space-md)',
-              background: 'linear-gradient(135deg, hsl(120, 70%, 40%), hsl(120, 70%, 50%))',
-              border: 'none',
-              padding: 'var(--space-md) var(--space-lg)',
-              fontSize: 'var(--fs-400)',
-              fontWeight: 'bold',
-              boxShadow: '0 4px 12px hsl(120, 70%, 40% / 0.3)',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
-            onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
+            style={{ marginTop: 'var(--space-md)' }}
           >
             Go to Dashboard Now
           </button>
@@ -185,10 +158,6 @@ const BudgetPage = () => {
       </div>
     );
   }
-  
-  const totalPages = Math.ceil(expenses.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedExpenses = expenses.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div

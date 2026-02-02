@@ -1,0 +1,64 @@
+/* Expense Edit Styles */
+.edit-input {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid var(--grey);
+  border-radius: 4px;
+  font-size: var(--fs-300);
+  background: var(--white);
+}
+
+.edit-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-light);
+}
+
+.amount-input {
+  text-align: right;
+  max-width: 100px;
+}
+
+.date-input {
+  max-width: 140px;
+}
+
+.budget-select {
+  max-width: 150px;
+}
+
+.expense-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: var(--fs-200);
+}
+
+.btn-sm svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .edit-input {
+    font-size: var(--fs-200);
+    padding: 2px 4px;
+  }
+  
+  .amount-input {
+    max-width: 80px;
+  }
+  
+  .date-input {
+    max-width: 120px;
+  }
+  
+  .budget-select {
+    max-width: 120px;
+  }
+}

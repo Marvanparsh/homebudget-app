@@ -11,6 +11,7 @@ import {
   formatCurrency,
   formatPercentage,
   BUDGET_CATEGORIES,
+  fetchUserData,
 } from "../helpers";
 
 const BudgetItem = ({ budget, showDelete = false, dragHandlers, index, isDragging, isDragOver }) => {
@@ -156,18 +157,23 @@ const BudgetItem = ({ budget, showDelete = false, dragHandlers, index, isDraggin
         <div className="flex-sm">
           <Form
             method="post"
-            action="delete"
             onSubmit={(event) => {
-              if (
-                !window.confirm(
-                  "Are you sure you want to permanently delete this budget?"
-                )
-              ) {
+              const expenses = fetchUserData("expenses") ?? [];
+              const budgetExpenses = expenses.filter(expense => expense.budgetId === id);
+              
+              let confirmMessage = "Are you sure you want to permanently delete this budget?";
+              if (budgetExpenses.length > 0) {
+                confirmMessage = `This budget has ${budgetExpenses.length} expense(s). Deleting it will also delete all associated expenses. This action cannot be undone. Are you sure?`;
+              }
+              
+              if (!window.confirm(confirmMessage)) {
                 event.preventDefault();
               }
             }}
           >
-            <button type="submit" className="btn">
+            <input type="hidden" name="_action" value="deleteBudget" />
+            <input type="hidden" name="budgetId" value={id} />
+            <button type="submit" className="btn btn--warning">
               <span>Delete Budget</span>
               <TrashIcon width={20} />
             </button>

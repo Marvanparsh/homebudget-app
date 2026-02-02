@@ -1,0 +1,161 @@
+/* Monthly Salary Demo Styles */
+.demo-prompt {
+  margin-bottom: var(--space-lg);
+  text-align: center;
+}
+
+.demo-card {
+  background: linear-gradient(135deg, hsl(var(--accent) / 0.1), hsl(var(--accent) / 0.05));
+  border: 2px solid hsl(var(--accent) / 0.3);
+  border-radius: var(--round-lg);
+  padding: var(--space-lg);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  box-shadow: 0 4px 12px hsl(var(--muted) / 0.1);
+  transition: all 0.3s ease;
+}
+
+.demo-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px hsl(var(--accent) / 0.2);
+}
+
+.demo-card h3 {
+  color: hsl(var(--accent));
+  margin: 0;
+  font-size: var(--fs-400);
+}
+
+.demo-card p {
+  color: hsl(var(--muted));
+  margin: 0;
+  max-width: none;
+  line-height: 1.5;
+}
+
+.demo-explanation {
+  background: hsl(var(--bkg));
+  border: 1px solid hsl(var(--light));
+  border-radius: var(--round-lg);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.demo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-sm);
+  border-bottom: 2px solid hsl(var(--accent));
+}
+
+.demo-header h3 {
+  color: hsl(var(--accent));
+  margin: 0;
+}
+
+.btn--small {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--fs-300);
+}
+
+.demo-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.demo-step {
+  display: flex;
+  gap: var(--space-md);
+  align-items: flex-start;
+  margin-bottom: var(--space-lg);
+}
+
+.step-number {
+  background: var(--accent);
+  color: var(--white);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-content h4 {
+  color: var(--text);
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.step-content p {
+  color: var(--text-muted);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.demo-example {
+  background: var(--grey-light);
+  padding: var(--space-sm);
+  border-radius: var(--radius);
+  font-size: var(--fs-300);
+}
+
+.demo-example div {
+  margin-bottom: var(--space-xs);
+}
+
+.demo-example div:last-child {
+  margin-bottom: 0;
+}
+
+.demo-benefits {
+  background: hsl(120, 70%, 95%);
+  border: 1px solid hsl(120, 70%, 50%);
+  border-radius: var(--round-lg);
+  padding: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+.demo-benefits h4 {
+  color: hsl(120, 70%, 30%);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.demo-benefits ul {
+  margin: 0;
+  padding-left: var(--space-md);
+}
+
+.demo-benefits li {
+  color: hsl(var(--text));
+  margin-bottom: var(--space-xs);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .demo-header {
+    flex-direction: column;
+    gap: var(--space-sm);
+    align-items: flex-start;
+  }
+  
+  .demo-step {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  
+  .step-number {
+    align-self: flex-start;
+  }
+}

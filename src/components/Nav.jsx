@@ -26,7 +26,6 @@ import { syncToGoogleDrive, syncFromGoogleDrive } from '../utils/googleDriveSync
 import { exportToFile, importFromFile } from '../utils/localSync'
 
 const Nav = ({ currentUser }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [showEmailModal, setShowEmailModal] = useState(false)
@@ -92,7 +91,6 @@ const Nav = ({ currentUser }) => {
           aria-label="Go to home"
           className="nav-logo"
           onClick={() => {
-            setIsMenuOpen(false)
             setIsUserDropdownOpen(false)
           }}
         >
@@ -100,20 +98,14 @@ const Nav = ({ currentUser }) => {
           <span>HomeBudget</span>
         </NavLink>
         
-        <button 
-          className="mobile-menu-btn"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label="Toggle menu"
-        >
-          {isMenuOpen ? <XMarkIcon width={24} /> : <Bars3Icon width={24} />}
-        </button>
+
         
-        <div className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
+        <div className="nav-menu">
           <ThemeToggle />
           {currentUser && (
             <div className="nav-user-section">
               {/* Desktop User Dropdown */}
-              <div className="user-dropdown-container desktop-only" ref={dropdownRef}>
+              <div className="user-dropdown-container" ref={dropdownRef}>
                 <button 
                   className="user-avatar-btn"
                   onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
@@ -360,60 +352,7 @@ const Nav = ({ currentUser }) => {
                   </>
                 )}
               </div>
-              
-              {/* Mobile User Menu */}
-              <div className="mobile-user-menu mobile-only">
-                <div className="mobile-user-header">
-                  <div className="user-avatar">
-                    {getUserInitials(currentUser.fullName)}
-                  </div>
-                  <div className="user-info">
-                    <div className="user-name">{currentUser.fullName}</div>
-                    <div className="user-email">{currentUser.email || 'user@example.com'}</div>
-                  </div>
-                </div>
-                
-                <div className="mobile-user-actions">
-                  <button className="mobile-action-btn" onClick={() => alert('Profile settings coming soon!')}>
-                    <UserIcon width={20} />
-                    <span>Profile</span>
-                  </button>
-                  
-                  <button className="mobile-action-btn" onClick={() => alert('Change password coming soon!')}>
-                    <KeyIcon width={20} />
-                    <span>Password</span>
-                  </button>
-                  
-                  <Form
-                    method="post"
-                    action="logout"
-                    onSubmit={() => setIsMenuOpen(false)}
-                    className="nav-form"
-                  >
-                    <button type="submit" className="mobile-action-btn logout">
-                      <ArrowRightOnRectangleIcon width={20} />
-                      <span>Logout</span>
-                    </button>
-                  </Form>
-                  
-                  <Form
-                    method="post"
-                    action="delete-account"
-                    onSubmit={(event) => {
-                      if (!window.confirm("Delete account and all data? This cannot be undone!")) {
-                        event.preventDefault()
-                      }
-                      setIsMenuOpen(false)
-                    }}
-                    className="nav-form"
-                  >
-                    <button type="submit" className="mobile-action-btn danger">
-                      <TrashIcon width={20} />
-                      <span>Delete Account</span>
-                    </button>
-                  </Form>
-                </div>
-              </div>
+
             </div>
           )}
         </div>
@@ -431,17 +370,22 @@ const Nav = ({ currentUser }) => {
             </div>
             <form className="modal-form" onSubmit={(e) => {
               e.preventDefault();
-              const formData = new FormData(e.target);
-              const updatedUser = {
-                ...currentUser,
-                fullName: formData.get('fullName'),
-                email: formData.get('email'),
-                username: formData.get('username')
-              };
-              localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-              window.dispatchEvent(new Event('authChange'));
-              setShowProfileModal(false);
-              alert('Profile updated successfully!');
+              try {
+                const formData = new FormData(e.target);
+                const updatedUser = {
+                  ...currentUser,
+                  fullName: formData.get('fullName'),
+                  email: formData.get('email'),
+                  username: formData.get('username')
+                };
+                localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+                window.dispatchEvent(new Event('authChange'));
+                setShowProfileModal(false);
+                alert('Profile updated successfully!');
+              } catch (error) {
+                console.error('Profile update failed:', error);
+                alert('Failed to update profile. Please try again.');
+              }
             }}>
               <div className="form-group">
                 <label>Full Name</label>
@@ -476,16 +420,21 @@ const Nav = ({ currentUser }) => {
             </div>
             <form className="modal-form" onSubmit={(e) => {
               e.preventDefault();
-              const formData = new FormData(e.target);
-              const preferences = {
-                budgetAlerts: formData.has('budgetAlerts'),
-                expenseNotifications: formData.has('expenseNotifications'),
-                weeklyReports: formData.has('weeklyReports')
-              };
-              setEmailPrefs(preferences);
-              localStorage.setItem('emailPreferences', JSON.stringify(preferences));
-              setShowEmailModal(false);
-              alert('Email preferences saved successfully!');
+              try {
+                const formData = new FormData(e.target);
+                const preferences = {
+                  budgetAlerts: formData.has('budgetAlerts'),
+                  expenseNotifications: formData.has('expenseNotifications'),
+                  weeklyReports: formData.has('weeklyReports')
+                };
+                setEmailPrefs(preferences);
+                localStorage.setItem('emailPreferences', JSON.stringify(preferences));
+                setShowEmailModal(false);
+                alert('Email preferences saved successfully!');
+              } catch (error) {
+                console.error('Email preferences save failed:', error);
+                alert('Failed to save preferences. Please try again.');
+              }
             }}>
               <div className="form-group">
                 <label style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
